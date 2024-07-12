@@ -158,11 +158,6 @@ export const getPrompts = ({ pm }: { pm: PM }): Prompt[] => {
 				startMessage: 'Setting up sveltekit-superforms',
 				endMessage: 'Setup sveltekit-superforms',
 			},
-			no: {
-				run: async ({}) => {
-					// do nothing
-				},
-			},
 		},
 		{
 			kind: 'multiselect',
@@ -211,7 +206,7 @@ export const getPrompts = ({ pm }: { pm: PM }): Prompt[] => {
 				},
 			],
 		},
-		{-
+		{
 			kind: 'confirm',
 			message: 'Install dependencies?',
 			yes: {
@@ -222,11 +217,6 @@ export const getPrompts = ({ pm }: { pm: PM }): Prompt[] => {
 				},
 				startMessage: 'Installing dependencies',
 				endMessage: 'Installed dependencies',
-			},
-			no: {
-				run: async ({}) => {
-					// do nothing
-				},
 			},
 		},
 	];

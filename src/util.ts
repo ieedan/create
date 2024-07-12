@@ -1,5 +1,5 @@
 import { PM } from 'detect-package-manager';
-import { execa } from 'execa';
+import { execa, ExecaError } from 'execa';
 import fs from 'fs-extra';
 import path from 'node:path';
 
@@ -32,7 +32,13 @@ export const addDependencies = async (
 		'--no-package-lock',
 	];
 
-	await execa({
-		cwd: dir,
-	})`${pm} install ${flags} ${packages.join(' ')}`;
+	try {
+		await execa(pm, ['install', ...flags, ...packages], {
+			cwd: dir,
+		});
+	} catch (error) {
+		if (error instanceof ExecaError) {
+			console.error(error);
+		}
+	}
 };
