@@ -7,6 +7,15 @@
 Project templates to quickly spin up projects the way I like to build them.
 
 To install a template run:
+
 ```bash
 npx @iedan/create
+```
+
+## Development
+
+To test the cli run:
+
+```
+npm run start
 ```

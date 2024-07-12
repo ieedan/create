@@ -51,7 +51,8 @@
 	"scripts": {
 		"format": "npx prettier . --write",
 		"build": "unbuild",
-		"check": "tsc --noEmit"
+		"check": "tsc --noEmit",
+		"start": "unbuild && node bin.mjs"
 	},
 	"repository": {
 		"type": "git",
