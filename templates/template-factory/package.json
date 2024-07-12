@@ -1,0 +1,17 @@
+{
+  "name": "template-placeholder-name",
+  "version": "1.0.0",
+  "main": "bin.mjs",
+  "bin": "./bin.mjs",
+  "scripts": {
+    "start": "node bin.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "fs-extra": "^11.2.0",
+    "template-factory": "^0.1.3"
+  }
+}

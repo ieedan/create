@@ -78,3 +78,33 @@ vite.config.ts.timestamp-*
 package-lock.json`;
 
 export const SVELTEKIT_NPMRC = 'engine-strict=true';
+
+export const UNBUILD_CONFIG_FILE = `import { defineBuildConfig } from 'unbuild';
+
+export default defineBuildConfig({
+	entries: ['src/index'],
+	failOnWarn: false,
+	declaration: true,
+	clean: true,
+	outDir: '.',
+});
+`;
+
+export const BIN_FILE = `import { create } from "template-factory";
+import fs from "fs-extra"
+
+const { version, name } = JSON.parse(
+    fs.readFileSync(new URL('package.json', import.meta.url), 'utf-8')
+);
+
+await create({
+    appName: name,
+    version: version,
+    templates: [
+        {
+            name: "Notes",
+            flag: "notes",
+            path: "templates/notes",
+        }
+    ]
+})`;
