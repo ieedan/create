@@ -53,3 +53,28 @@ inject({ mode: dev ? "development" : "production" });`;
 export const VERCEL_SPEED_INSIGHTS_HOOKS_CLIENT_TS = `import { injectSpeedInsights } from "@vercel/speed-insights/sveltekit";
 
 injectSpeedInsights();`;
+
+export const SVELTEKIT_GIT_IGNORE = `node_modules
+
+# Output
+.output
+.vercel
+/.svelte-kit
+/build
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+package-lock.json`;
+
+export const SVELTEKIT_NPMRC = 'engine-strict=true';

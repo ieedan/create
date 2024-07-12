@@ -3,16 +3,17 @@ import path from 'node:path';
 import { create, Template } from 'template-factory';
 import { getPrompts } from './prompts';
 import color from 'chalk';
+import { SVELTEKIT_GIT_IGNORE, SVELTEKIT_NPMRC } from './template-files';
 
 const main = async () => {
-	const pm = "npm";
+	const pm = 'npm';
 
 	// define the project templates inside of `/templates` here
 	const templates: Template[] = [
 		{
 			name: 'SvelteKit',
 			flag: 'sveltekit',
-			path: new URL("templates/sveltekit", import.meta.url).pathname.slice(1),
+			path: new URL('templates/sveltekit', import.meta.url).pathname.slice(1),
 			excludeFiles: ['README.md', 'package-lock.json'],
 			prompts: getPrompts({ pm }),
 			templateFiles: [
@@ -27,18 +28,36 @@ const main = async () => {
 				},
 			],
 			copyCompleted: async ({ dir, projectName }) => {
-				const file = path.join(dir, 'README.md');
+				// setup files
+				const files = [
+					{
+						name: 'README.md',
+						content: `# ${projectName}
+This project was created for you with the help of [template-factory](https://github.com/ieedan/template-factory-js)`,
+					},
+					// these are not uploaded to NPM for some reason 
+					{
+						name: '.gitignore',
+						content: SVELTEKIT_GIT_IGNORE,
+					},
+					{
+						name: '.npmrc',
+						content: SVELTEKIT_NPMRC,
+					},
+				];
 
-				const content = `# ${projectName}
-This project was created for you with the help of [template-factory](https://github.com/ieedan/template-factory-js)`;
-
-				await fs.writeFile(file, content);
+				// generate files
+				for (const file of files) {
+					await fs.writeFile(path.join(dir, file.name), file.content);
+				}
 			},
 		},
 	];
 
 	// get version from package.json
-	const { version, name } = JSON.parse(fs.readFileSync(new URL('package.json', import.meta.url), 'utf-8'));
+	const { version, name } = JSON.parse(
+		fs.readFileSync(new URL('package.json', import.meta.url), 'utf-8')
+	);
 
 	// create template
 	await create({

@@ -1,4 +1,3 @@
-import { PM } from 'detect-package-manager';
 import { execa, ExecaError } from 'execa';
 import fs from 'fs-extra';
 import path from 'node:path';
@@ -6,7 +5,7 @@ import path from 'node:path';
 /** Allows you to remove dependency without creating node_modules */
 export const removeDependency = async (
 	packageName: string,
-	{ pm: _, dir }: { pm: PM; dir: string }
+	{ pm: _, dir }: { pm: string; dir: string }
 ) => {
 	const file = path.join(dir, 'package.json');
 
@@ -24,7 +23,7 @@ export const removeDependency = async (
 export const addDependencies = async (
 	packages: string[],
 	scope: 'dev' | 'regular',
-	{ pm, dir }: { pm: PM; dir: string }
+	{ pm, dir }: { pm: string; dir: string }
 ) => {
 	const flags = [
 		scope == 'dev' ? '--save-dev' : '--save',

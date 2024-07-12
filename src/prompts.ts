@@ -3,7 +3,6 @@ import { execa } from 'execa';
 import { addDependencies, removeDependency } from './util';
 import fs from 'fs-extra';
 import path from 'node:path';
-import { PM } from 'detect-package-manager';
 import {
 	iisSvelteConfig,
 	SVELTE_CONFIG_FILE_VERCEL,
@@ -11,7 +10,7 @@ import {
 	VERCEL_SPEED_INSIGHTS_HOOKS_CLIENT_TS,
 } from './template-files';
 
-export const getPrompts = ({ pm }: { pm: PM }): Prompt[] => {
+export const getPrompts = ({ pm }: { pm: string }): Prompt[] => {
 	return [
 		{
 			kind: 'select',
