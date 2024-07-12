@@ -1,20 +1,18 @@
 import fs from 'fs-extra';
 import path from 'node:path';
-import { create, type Template } from 'template-factory';
-import { detect } from 'detect-package-manager';
+import { create, Template } from 'template-factory';
 import { getPrompts } from './prompts';
 import color from 'chalk';
 
 const main = async () => {
-	// detect package manager
-	const pm = await detect();
+	const pm = "npm";
 
 	// define the project templates inside of `/templates` here
 	const templates: Template[] = [
 		{
 			name: 'SvelteKit',
 			flag: 'sveltekit',
-			path: 'templates/sveltekit',
+			path: new URL("templates/sveltekit", import.meta.url).pathname.slice(1),
 			excludeFiles: ['README.md', 'package-lock.json'],
 			prompts: getPrompts({ pm }),
 			templateFiles: [
@@ -40,11 +38,11 @@ This project was created for you with the help of [template-factory](https://git
 	];
 
 	// get version from package.json
-	const { version } = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
+	const { version, name } = JSON.parse(fs.readFileSync(new URL('package.json', import.meta.url), 'utf-8'));
 
 	// create template
 	await create({
-		appName: '@ieedan/templates',
+		appName: name,
 		templates,
 		version,
 		customization: {

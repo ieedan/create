@@ -1,6 +1,6 @@
 {
-	"name": "@ieedan/templates",
-	"version": "1.0.0",
+	"name": "@iedan/create",
+	"version": "1.0.5",
 	"description": "Project templates to quickly spin up projects the way I like to build them.",
 	"main": "./dist/index.mjs",
 	"module": "./dist/index.mjs",
@@ -8,7 +8,23 @@
 	"bin": "./bin.mjs",
 	"files": [
 		"bin.mjs",
-		"dist"
+		"package.json",
+		"package-lock.json",
+		"README.md",
+		"templates",
+		"index.d.mts",
+		"index.d.ts",
+		"index.mjs",
+		"prompts.d.mts",
+		"prompts.d.ts",
+		"prompts.mjs",
+		"template-files.d.mts",
+		"template-files.d.ts",
+		"template-files.mjs",
+		"util.d.mts",
+		"util.d.ts",
+		"util.mjs",
+		".gitignore"
 	],
 	"publishConfig": {
 		"scripts": {},
@@ -17,15 +33,15 @@
 	"typesVersions": {
 		"*": {
 			"*": [
-				"./dist/*",
-				"./dist/index.d.ts"
+				"./*",
+				"./index.d.ts"
 			]
 		}
 	},
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.mjs"
+			"types": "./index.d.ts",
+			"import": "./index.mjs"
 		}
 	},
 	"sideEffects": false,
