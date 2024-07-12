@@ -2,7 +2,10 @@ import { defineBuildConfig } from 'unbuild'
 
 export default defineBuildConfig({
   entries: [
-    'index',
+    'src/index',
+    'src/prompts',
+    'src/template-files',
+    'src/util',
   ],
   failOnWarn: false,
   declaration: true,
