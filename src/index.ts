@@ -294,7 +294,11 @@ This project was created for you with the help of [template-factory](https://git
 					initialValue: true,
 					yes: {
 						run: async ({ dir }) => {
-							await addDependencies(['typescript', 'unbuild', '@types/fs-extra'], 'dev', { pm, dir });
+							await addDependencies(
+								['typescript', 'unbuild', '@types/fs-extra'],
+								'dev',
+								{ pm, dir }
+							);
 
 							await fs.writeFile(
 								path.join(dir, 'build.config.ts'),
@@ -334,9 +338,9 @@ import('./index.mjs');`;
 
 							await fs.writeFile(path.join(dir, 'bin.mjs'), binFile);
 
-							await fs.createFile(path.join(dir, "./src/index.ts"));
+							await fs.createFile(path.join(dir, './src/index.ts'));
 
-							await fs.writeFile(path.join(dir, "./src/index.ts"), BIN_FILE)
+							await fs.writeFile(path.join(dir, './src/index.ts'), BIN_FILE);
 						},
 						startMessage: 'Setting up for TypeScript',
 						endMessage: 'Set up for TypeScript',
@@ -368,7 +372,7 @@ import('./index.mjs');`;
 					message: 'Install prettier?',
 					yes: {
 						run: async ({ dir }) => {
-							await addDependencies(["prettier"], "dev", { pm, dir });
+							await addDependencies(['prettier'], 'dev', { pm, dir });
 
 							const rc = `{
 	"useTabs": true,
@@ -381,7 +385,15 @@ import('./index.mjs');`;
 
 							await fs.writeFile(path.join(dir, '.prettierrc'), rc);
 
-							await fs.writeFile(path.join(dir, '.prettierignore'), "templates");
+							await fs.writeFile(path.join(dir, '.prettierignore'), 'templates');
+
+							const packagePath = path.join(dir, 'package.json');
+
+							const pkg = JSON.parse((await fs.readFile(packagePath)).toString());
+
+							pkg.scripts.format = 'npx prettier . --write';
+
+							await fs.writeFile(packagePath, JSON.stringify(pkg, null, 2));
 						},
 						startMessage: 'Setting up prettier',
 						endMessage: 'Set up prettier',

@@ -1,6 +1,6 @@
 {
 	"name": "@iedan/create",
-	"version": "1.0.12",
+	"version": "1.0.13",
 	"description": "Project templates to quickly spin up projects the way I like to build them.",
 	"main": "./dist/index.mjs",
 	"module": "./dist/index.mjs",
@@ -71,7 +71,7 @@
 		"chalk": "^5.3.0",
 		"execa": "^9.3.0",
 		"fs-extra": "^11.2.0",
-		"template-factory": "^0.1.3"
+		"template-factory": "^0.1.4"
 	},
 	"devDependencies": {
 		"@types/fs-extra": "^11.0.4",
