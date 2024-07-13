@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'node:path';
-import { create, Template } from 'template-factory';
+import { create, Template, util } from 'template-factory';
 import color from 'chalk';
 import {
 	BIN_FILE,
@@ -24,7 +24,7 @@ const main = async () => {
 		{
 			name: 'SvelteKit',
 			flag: 'sveltekit',
-			path: new URL('templates/sveltekit', import.meta.url).pathname.slice(1),
+			path: util.relative('templates/sveltekit', import.meta.url),
 			excludeFiles: ['README.md', 'package-lock.json', 'node_modules'],
 			prompts: [
 				{
@@ -285,7 +285,7 @@ This project was created for you with the help of [template-factory](https://git
 		{
 			name: 'template-factory Project',
 			flag: 'template-factory',
-			path: new URL('templates/template-factory', import.meta.url).pathname.slice(1),
+			path: util.relative('templates/template-factory', import.meta.url),
 			excludeFiles: ['package-lock.json', 'README.md', 'node_modules'],
 			prompts: [
 				{

@@ -1,3 +1,3 @@
-import Root from './light-switch.svelte'
+import Root from './light-switch.svelte';
 
 export default Root;
