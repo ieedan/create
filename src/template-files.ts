@@ -78,3 +78,55 @@ vite.config.ts.timestamp-*
 package-lock.json`;
 
 export const SVELTEKIT_NPMRC = 'engine-strict=true';
+
+export const UNBUILD_CONFIG_FILE = `import { defineBuildConfig } from 'unbuild';
+
+export default defineBuildConfig({
+	entries: ['src/index'],
+	failOnWarn: false,
+	declaration: true,
+	clean: true,
+	outDir: '.',
+});
+`;
+
+export const BIN_FILE = `import { create } from 'template-factory';
+import fs from 'fs-extra';
+
+const main = async () => {
+	const { version, name } = JSON.parse(
+		fs.readFileSync(new URL('package.json', import.meta.url), 'utf-8')
+	);
+
+	await create({
+		appName: name,
+		version: version,
+		templates: [
+			{
+				name: 'Notes',
+				flag: 'notes',
+				path: new URL('templates/notes', import.meta.url).pathname.slice(1),
+			},
+		],
+	});
+};
+
+main();`;
+
+export const TS_CONFIG_FILE = `{
+	"compilerOptions": {
+		"target": "ESNext",
+		"lib": ["ESNext"],
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"resolveJsonModule": true,
+		"strict": true,
+		"strictNullChecks": true,
+		"noEmit": true,
+		"esModuleInterop": true,
+		"skipDefaultLibCheck": true,
+		"skipLibCheck": true
+	},
+	"exclude": ["node_modules", "templates"]
+}
+`;

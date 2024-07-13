@@ -1,0 +1,15 @@
+{
+	"name": "template-placeholder-name",
+	"description": "",
+	"version": "1.0.0",
+	"author": "",
+	"main": "bin.mjs",
+	"bin": "./bin.mjs",
+	"scripts": {},
+	"keywords": [],
+	"license": "ISC",
+	"dependencies": {
+		"fs-extra": "^11.2.0",
+		"template-factory": "^0.1.3"
+	}
+}
