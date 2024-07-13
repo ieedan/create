@@ -8,6 +8,7 @@ import {
 	SVELTE_CONFIG_FILE_VERCEL,
 	SVELTEKIT_GIT_IGNORE,
 	SVELTEKIT_NPMRC,
+	TS_CONFIG_FILE,
 	UNBUILD_CONFIG_FILE,
 	VERCEL_ANALYTICS_HOOKS_CLIENT_TS,
 	VERCEL_SPEED_INSIGHTS_HOOKS_CLIENT_TS,
@@ -308,6 +309,8 @@ This project was created for you with the help of [template-factory](https://git
 							pkg.scripts.build = 'unbuild';
 
 							await fs.writeFile(packagePath, JSON.stringify(pkg, null, 2));
+
+							await fs.writeFile(path.join(dir, 'tsconfig.json'), TS_CONFIG_FILE);
 
 							const gitignore = `node_modules
 

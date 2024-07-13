@@ -105,10 +105,28 @@ const main = async () => {
 			{
 				name: 'Notes',
 				flag: 'notes',
-				path: 'templates/notes',
+				path: new URL('templates/notes', import.meta.url).pathname.slice(1),
 			},
 		],
 	});
 };
 
 main();`;
+
+export const TS_CONFIG_FILE = `{
+	"compilerOptions": {
+		"target": "ESNext",
+		"lib": ["ESNext"],
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"resolveJsonModule": true,
+		"strict": true,
+		"strictNullChecks": true,
+		"noEmit": true,
+		"esModuleInterop": true,
+		"skipDefaultLibCheck": true,
+		"skipLibCheck": true
+	},
+	"exclude": ["node_modules", "dist", "templates"]
+}
+`;
