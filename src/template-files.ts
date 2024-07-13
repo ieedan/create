@@ -127,6 +127,6 @@ export const TS_CONFIG_FILE = `{
 		"skipDefaultLibCheck": true,
 		"skipLibCheck": true
 	},
-	"exclude": ["node_modules", "dist", "templates"]
+	"exclude": ["node_modules", "templates"]
 }
 `;
