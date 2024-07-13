@@ -5,6 +5,7 @@ import color from 'chalk';
 import {
 	BIN_FILE,
 	iisSvelteConfig,
+	PUBLISH_WORKFLOW,
 	SVELTE_CONFIG_FILE_VERCEL,
 	SVELTEKIT_GIT_IGNORE,
 	SVELTEKIT_NPMRC,
@@ -398,6 +399,21 @@ import('./index.mjs');`;
 						startMessage: 'Setting up prettier',
 						endMessage: 'Set up prettier',
 					},
+				},
+				{
+					kind: "confirm",
+					message: "Setup automatic publish workflow?",
+					yes: {
+						run: async ({ dir }) => {
+							const filePath = path.join(dir, '.github/workflows/publish.yml');
+
+							await fs.createFile(filePath);
+
+							await fs.writeFile(filePath, PUBLISH_WORKFLOW);
+						},
+						startMessage: "Setting up publish workflow",
+						endMessage: "Set up publish workflow"
+					}
 				},
 				{
 					kind: 'confirm',
