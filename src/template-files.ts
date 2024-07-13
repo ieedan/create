@@ -90,21 +90,25 @@ export default defineBuildConfig({
 });
 `;
 
-export const BIN_FILE = `import { create } from "template-factory";
-import fs from "fs-extra"
+export const BIN_FILE = `import { create } from 'template-factory';
+import fs from 'fs-extra';
 
-const { version, name } = JSON.parse(
-    fs.readFileSync(new URL('package.json', import.meta.url), 'utf-8')
-);
+const main = async () => {
+	const { version, name } = JSON.parse(
+		fs.readFileSync(new URL('package.json', import.meta.url), 'utf-8')
+	);
 
-await create({
-    appName: name,
-    version: version,
-    templates: [
-        {
-            name: "Notes",
-            flag: "notes",
-            path: "templates/notes",
-        }
-    ]
-})`;
+	await create({
+		appName: name,
+		version: version,
+		templates: [
+			{
+				name: 'Notes',
+				flag: 'notes',
+				path: 'templates/notes',
+			},
+		],
+	});
+};
+
+main();`;
