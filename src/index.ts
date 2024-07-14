@@ -2,18 +2,6 @@ import fs from 'fs-extra';
 import path from 'node:path';
 import { create, Template, util } from 'template-factory';
 import color from 'chalk';
-import {
-	BIN_FILE,
-	iisSvelteConfig,
-	PUBLISH_WORKFLOW,
-	SVELTE_CONFIG_FILE_VERCEL,
-	SVELTEKIT_GIT_IGNORE,
-	SVELTEKIT_NPMRC,
-	TS_CONFIG_FILE,
-	UNBUILD_CONFIG_FILE,
-	VERCEL_ANALYTICS_HOOKS_CLIENT_TS,
-	VERCEL_SPEED_INSIGHTS_HOOKS_CLIENT_TS,
-} from './template-files';
 import { execa } from 'execa';
 import { addDependencies, removeDependency } from './util';
 
@@ -25,8 +13,8 @@ const main = async () => {
 		{
 			name: 'SvelteKit',
 			flag: 'sveltekit',
-			path: util.relative('templates/sveltekit', import.meta.url),
-			excludeFiles: ['README.md', 'package-lock.json', 'node_modules'],
+			path: util.relative('../templates/sveltekit', import.meta.url),
+			excludeFiles: ['README.md', 'package-lock.json', 'node_modules', 'template-files'],
 			prompts: [
 				{
 					kind: 'select',
@@ -53,9 +41,12 @@ const main = async () => {
 										dir,
 									});
 
-									const config = SVELTE_CONFIG_FILE_VERCEL;
+									const configPath = util.relative(
+										'../templates/sveltekit/template-files/vercel/svelte.config.js',
+										import.meta.url
+									);
 
-									await fs.writeFile(path.join(dir, 'svelte.config.js'), config);
+									await fs.copy(configPath, path.join(dir, 'svelte.config.js'));
 
 									return [
 										{
@@ -78,10 +69,12 @@ const main = async () => {
 															);
 
 															if (!(await fs.exists(hooksPath))) {
-																const code =
-																	VERCEL_ANALYTICS_HOOKS_CLIENT_TS;
+																const codePath = util.relative(
+																	'../templates/sveltekit/template-files/vercel/hooks.client.ts/+analytics/hooks.client.ts',
+																	import.meta.url
+																);
 
-																await fs.writeFile(hooksPath, code);
+																await fs.copy(codePath, hooksPath);
 															} else {
 																let code = (
 																	await fs.readFile(hooksPath)
@@ -116,10 +109,12 @@ const main = async () => {
 															);
 
 															if (!(await fs.exists(hooksPath))) {
-																const code =
-																	VERCEL_SPEED_INSIGHTS_HOOKS_CLIENT_TS;
+																const codePath = util.relative(
+																	'../templates/sveltekit/template-files/vercel/hooks.client.ts/+speed-insights/hooks.client.ts',
+																	import.meta.url
+																);
 
-																await fs.writeFile(hooksPath, code);
+																await fs.copy(codePath, hooksPath);
 															} else {
 																let code = (
 																	await fs.readFile(hooksPath)
@@ -157,9 +152,16 @@ const main = async () => {
 										dir,
 									});
 
-									const config = iisSvelteConfig(projectName);
+									const configPath = util.relative(
+										'../templates/sveltekit/template-files/iis/svelte.config.js',
+										import.meta.url
+									);
 
-									await fs.writeFile(path.join(dir, 'svelte.config.js'), config);
+									let content = (await fs.readFile(configPath)).toString();
+
+									content = content.replace('${projectName}', projectName);
+
+									await fs.writeFile(path.join(dir, 'svelte.config.js'), content);
 								},
 								startMessage: 'Setting up sveltekit-adapter-iis',
 								endMessage: 'Setup sveltekit-adapter-iis',
@@ -269,11 +271,25 @@ This project was created for you with the help of [template-factory](https://git
 					// these are not uploaded to NPM for some reason
 					{
 						name: '.gitignore',
-						content: SVELTEKIT_GIT_IGNORE,
+						content: (
+							await fs.readFile(
+								util.relative(
+									'../templates/sveltekit/template-files/gitignore.txt',
+									import.meta.url
+								)
+							)
+						).toString(),
 					},
 					{
 						name: '.npmrc',
-						content: SVELTEKIT_NPMRC,
+						content: (
+							await fs.readFile(
+								util.relative(
+									'../templates/sveltekit/template-files/npmrc.txt',
+									import.meta.url
+								)
+							)
+						).toString(),
 					},
 				];
 
@@ -286,8 +302,8 @@ This project was created for you with the help of [template-factory](https://git
 		{
 			name: 'template-factory Project',
 			flag: 'template-factory',
-			path: util.relative('templates/template-factory', import.meta.url),
-			excludeFiles: ['package-lock.json', 'README.md', 'node_modules'],
+			path: util.relative('../templates/template-factory', import.meta.url),
+			excludeFiles: ['package-lock.json', 'README.md', 'node_modules', 'template-files'],
 			prompts: [
 				{
 					kind: 'confirm',
@@ -301,10 +317,12 @@ This project was created for you with the help of [template-factory](https://git
 								{ pm, dir }
 							);
 
-							await fs.writeFile(
-								path.join(dir, 'build.config.ts'),
-								UNBUILD_CONFIG_FILE
+							const buildConfigPath = util.relative(
+								'../templates/template-factory/template-files/build.config.ts',
+								import.meta.url
 							);
+
+							await fs.copy(buildConfigPath, path.join(dir, 'build.config.ts'));
 
 							const packagePath = path.join(dir, 'package.json');
 
@@ -315,33 +333,34 @@ This project was created for you with the help of [template-factory](https://git
 
 							await fs.writeFile(packagePath, JSON.stringify(pkg, null, 2));
 
-							await fs.writeFile(path.join(dir, 'tsconfig.json'), TS_CONFIG_FILE);
+							const tsConfigPath = util.relative(
+								'../templates/template-factory/template-files/tsconfig.json',
+								import.meta.url
+							);
 
-							const gitignore = `node_modules
+							await fs.copy(tsConfigPath, path.join(dir, 'tsconfig.json'));
 
-index.d.mts
-index.d.ts
-index.mjs
-prompts.d.mts
-prompts.d.ts
-prompts.mjs
-template-files.d.mts
-template-files.d.ts
-template-files.mjs
-util.d.mts
-util.d.ts
-util.mjs`;
+							const gitignorePath = util.relative(
+								'../templates/template-factory/template-files/gitignore.txt',
+								import.meta.url
+							);
+
+							const gitignore = await fs.readFile(gitignorePath);
 
 							await fs.writeFile(path.join(dir, '.gitignore'), gitignore);
 
-							const binFile = `#!/usr/bin/env node
-import('./index.mjs');`;
+							const binPath = util.relative(
+								'../templates/template-factory/template-files/index.js',
+								import.meta.url
+							);
+
+							await fs.mkdir(path.join(dir, 'src'));
+
+							await fs.copy(binPath, path.join(dir, './src/index.ts'));
+
+							const binFile = `#!/usr/bin/env node\r\nimport('./dist/index.mjs');`;
 
 							await fs.writeFile(path.join(dir, 'bin.mjs'), binFile);
-
-							await fs.createFile(path.join(dir, './src/index.ts'));
-
-							await fs.writeFile(path.join(dir, './src/index.ts'), BIN_FILE);
 						},
 						startMessage: 'Setting up for TypeScript',
 						endMessage: 'Set up for TypeScript',
@@ -360,7 +379,16 @@ import('./index.mjs');`;
 
 							await fs.writeFile(path.join(dir, '.gitignore'), gitignore);
 
-							const binFile = `#!/usr/bin/env node\r\n` + BIN_FILE;
+							const indexPath = util.relative(
+								'../templates/template-factory/template-files/index.js',
+								import.meta.url
+							);
+
+							await fs.mkdir(path.join(dir, 'src'));
+
+							await fs.copy(indexPath, path.join(dir, 'src/index.js'));
+
+							const binFile = `#!/usr/bin/env node\r\nimport('./src/index.js');`;
 
 							await fs.writeFile(path.join(dir, 'bin.mjs'), binFile);
 						},
@@ -375,16 +403,12 @@ import('./index.mjs');`;
 						run: async ({ dir }) => {
 							await addDependencies(['prettier'], 'dev', { pm, dir });
 
-							const rc = `{
-	"useTabs": true,
-	"tabWidth": 4,
-	"singleQuote": true,
-	"trailingComma": "es5",
-	"printWidth": 100
-}
-`;
+							const prettierrcPath = util.relative(
+								'../templates/template-factory/template-files/.prettierrc',
+								import.meta.url
+							);
 
-							await fs.writeFile(path.join(dir, '.prettierrc'), rc);
+							await fs.copy(prettierrcPath, path.join(dir, '.prettierrc'));
 
 							await fs.writeFile(path.join(dir, '.prettierignore'), 'templates');
 
@@ -401,19 +425,24 @@ import('./index.mjs');`;
 					},
 				},
 				{
-					kind: "confirm",
-					message: "Setup automatic publish workflow?",
+					kind: 'confirm',
+					message: 'Setup automatic publish workflow?',
 					yes: {
 						run: async ({ dir }) => {
 							const filePath = path.join(dir, '.github/workflows/publish.yml');
 
 							await fs.createFile(filePath);
 
-							await fs.writeFile(filePath, PUBLISH_WORKFLOW);
+							const publishPath = util.relative(
+								'../templates/template-factory/template-files/publish.yml',
+								import.meta.url
+							);
+
+							await fs.copy(publishPath, filePath);
 						},
-						startMessage: "Setting up publish workflow",
-						endMessage: "Set up publish workflow"
-					}
+						startMessage: 'Setting up publish workflow',
+						endMessage: 'Set up publish workflow',
+					},
 				},
 				{
 					kind: 'confirm',
@@ -445,7 +474,7 @@ import('./index.mjs');`;
 
 	// get version from package.json
 	const { version, name } = JSON.parse(
-		fs.readFileSync(new URL('package.json', import.meta.url), 'utf-8')
+		fs.readFileSync(new URL('../package.json', import.meta.url), 'utf-8')
 	);
 
 	// create template

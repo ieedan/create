@@ -5,6 +5,7 @@
 	"author": "",
 	"main": "bin.mjs",
 	"bin": "./bin.mjs",
+	"type": "module",
 	"scripts": {},
 	"keywords": [],
 	"license": "ISC",
