@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 
 const main = async () => {
 	const { version, name } = JSON.parse(
-		fs.readFileSync(new URL('package.json', import.meta.url), 'utf-8')
+		fs.readFileSync(new URL('../package.json', import.meta.url), 'utf-8')
 	);
 
 	await create({
@@ -13,7 +13,8 @@ const main = async () => {
 			{
 				name: 'Notes',
 				flag: 'notes',
-				path: util.relative('templates/notes', import.meta.url),
+				path: util.relative('../templates/notes', import.meta.url),
+				excludeFiles: ["template-files"]
 			},
 		],
 	});
