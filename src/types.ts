@@ -1,4 +1,4 @@
 export type SveltekitTemplateState = {
-    installedDependencies: boolean;
-    addedProviders: string[];
+	installedDependencies: boolean;
+	addedProviders: string[];
 };
