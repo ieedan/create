@@ -23,7 +23,7 @@ const main = async () => {
 						{
 							name: 'Auto',
 							select: {
-								run: async ({}) => {
+								run: async () => {
 									// do nothing its already setup
 								},
 								startMessage: 'Setting up @sveltejs/adapter-auto',
@@ -34,7 +34,7 @@ const main = async () => {
 							name: 'Vercel',
 							select: {
 								run: async ({ dir }) => {
-									await removeDependency('@sveltejs/adapter-auto', { pm, dir });
+									await removeDependency('@sveltejs/adapter-auto', { dir });
 
 									await addDependencies(['@sveltejs/adapter-vercel'], 'dev', {
 										pm,
@@ -145,7 +145,7 @@ const main = async () => {
 							name: 'IIS',
 							select: {
 								run: async ({ dir, projectName }) => {
-									await removeDependency('@sveltejs/adapter-auto', { pm, dir });
+									await removeDependency('@sveltejs/adapter-auto', { dir });
 
 									await addDependencies(['sveltekit-adapter-iis'], 'dev', {
 										pm,
@@ -488,7 +488,7 @@ This project was created for you with the help of [template-factory](https://git
 				const ver = color.gray(` v${version} `);
 				return name + ver;
 			},
-			outro: async ({}) => {
+			outro: async () => {
 				return color.green('All done!');
 			},
 		},

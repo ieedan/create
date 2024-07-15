@@ -22,15 +22,15 @@
 	"typesVersions": {
 		"*": {
 			"*": [
-				"./*",
-				"./index.d.ts"
+				"./dist/*",
+				"./dist/index.d.ts"
 			]
 		}
 	},
 	"exports": {
 		".": {
-			"types": "./index.d.ts",
-			"import": "./index.mjs"
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.mjs"
 		}
 	},
 	"sideEffects": false,
@@ -39,7 +39,8 @@
 		"format": "npx prettier . --write",
 		"build": "unbuild",
 		"check": "tsc --noEmit",
-		"start": "unbuild && node bin.mjs"
+		"start": "unbuild && node bin.mjs",
+		"lint": "prettier --check . && eslint ."
 	},
 	"repository": {
 		"type": "git",
@@ -61,8 +62,16 @@
 		"template-factory": "^0.1.6"
 	},
 	"devDependencies": {
+		"@eslint/js": "^9.7.0",
 		"@types/fs-extra": "^11.0.4",
+		"@types/node": "^20.14.10",
+		"eslint": "^9.7.0",
+		"globals": "^15.8.0",
 		"prettier": "^3.3.2",
+		"typescript-eslint": "^7.16.0",
 		"unbuild": "^2.0.0"
+	},
+	"overrides": {
+		"eslint": "^9.7.0"
 	}
 }

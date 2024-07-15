@@ -3,10 +3,7 @@ import fs from 'fs-extra';
 import path from 'node:path';
 
 /** Allows you to remove dependency without creating node_modules */
-export const removeDependency = async (
-	packageName: string,
-	{ pm: _, dir }: { pm: string; dir: string }
-) => {
+export const removeDependency = async (packageName: string, { dir }: { dir: string }) => {
 	const file = path.join(dir, 'package.json');
 
 	const pkg = JSON.parse((await fs.readFile(file)).toString());
