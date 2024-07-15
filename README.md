@@ -29,6 +29,7 @@ Comes installed with:
 And allows you to choose to add:
 
 -   [sveltekit-superforms](https://superforms.rocks/)
+-   [Auth.js](https://authjs.dev/)
 -   [threlte](https://threlte.xyz/)
 
 ### template-factory
