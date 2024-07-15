@@ -1,12 +1,28 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import LightSwitch from '$lib/components/ui/light-svelte/light-switch.svelte';
+    import { SignIn, SignOut } from '@auth/sveltekit/components';
+
+	export let data;
 </script>
 
 <header class="flex place-items-center justify-center border-b px-6 py-2">
 	<div class="flex w-full max-w-6xl place-items-center justify-between">
 		<div></div>
 		<div class="flex place-items-center gap-2">
+            {#if data.session}
+                <SignOut>
+                    <Button slot="submitButton">
+                        Sign Out
+                    </Button>
+                </SignOut>
+            {:else}
+                <SignIn>
+                    <Button slot="submitButton">
+                        Sign In
+                    </Button>
+                </SignIn>
+            {/if}
 			<LightSwitch />
 		</div>
 	</div>

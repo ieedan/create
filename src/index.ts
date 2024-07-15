@@ -192,6 +192,244 @@ const main = async () => {
 					message: 'What features should be included?',
 					options: [
 						{
+							name: 'Auth.js',
+							select: {
+								run: async ({ dir }) => {
+									await addDependencies(['@auth/sveltekit'], 'regular', {
+										pm,
+										dir,
+									});
+
+									const authPath = util.relative(
+										'../templates/sveltekit/template-files/Auth.js/auth.ts',
+										import.meta.url
+									);
+
+									await fs.copy(authPath, path.join(dir, 'src/auth.ts'));
+
+									const hooksPath = util.relative(
+										'../templates/sveltekit/template-files/Auth.js/hooks.server.ts',
+										import.meta.url
+									);
+
+									await fs.copy(hooksPath, path.join(dir, 'src/hooks.server.ts'));
+
+									const signinPath = util.relative(
+										'../templates/sveltekit/template-files/Auth.js/signin/+page.server.ts',
+										import.meta.url
+									);
+
+									await fs.createFile(
+										path.join(dir, 'src/routes/signin/+page.server.ts')
+									);
+
+									await fs.copy(
+										signinPath,
+										path.join(dir, 'src/routes/signin/+page.server.ts')
+									);
+
+									const signoutPath = util.relative(
+										'../templates/sveltekit/template-files/Auth.js/signout/+page.server.ts',
+										import.meta.url
+									);
+
+									await fs.createFile(
+										path.join(dir, 'src/routes/signout/+page.server.ts')
+									);
+
+									await fs.copy(
+										signoutPath,
+										path.join(dir, 'src/routes/signout/+page.server.ts')
+									);
+
+									await fs.copy(
+										util.relative(
+											'../templates/sveltekit/template-files/Auth.js/+page.svelte',
+											import.meta.url
+										),
+										path.join(dir, 'src/routes/+page.svelte')
+									);
+
+									await fs.copy(
+										util.relative(
+											'../templates/sveltekit/template-files/Auth.js/+layout.server.ts',
+											import.meta.url
+										),
+										path.join(dir, 'src/routes/+layout.server.ts')
+									);
+
+									return [
+										{
+											kind: 'confirm',
+											message: "Generate auth secret and add it to '.env'?",
+											yes: {
+												run: async ({ dir }) => {
+													await execa({ cwd: dir })`npx auth secret`;
+												},
+												startMessage: "Setting up '.env' file for Auth.js",
+												endMessage: "Setup '.env' file for Auth.js",
+											},
+											no: {
+												run: async ({ dir }) => {
+													const envFile =
+														'# Auth.js\r\n# Generate a secret with `npx auth secret`\r\nAUTH_SECRET=';
+
+													await fs.writeFile(
+														path.join(dir, '.env'),
+														envFile
+													);
+												},
+												startMessage: "Setting up '.env' file for Auth.js",
+												endMessage: "Setup '.env' file for Auth.js",
+											},
+										},
+										{
+											kind: 'multiselect',
+											message: 'Add OAuth providers?',
+											options: [
+												{
+													name: 'GitHub',
+													select: {
+														run: async ({ dir }) => {
+															const envPath = path.join(dir, '.env');
+
+															let envFile = (
+																await fs.readFile(envPath)
+															).toString();
+
+															envFile =
+																envFile +
+																`\r\n# Setup GitHub app here https://github.com/settings/applications/new\r\nAUTH_GITHUB_ID\r\nAUTH_GITHUB_SECRET`;
+
+															await fs.writeFile(envPath, envFile);
+
+															const authPath = path.join(
+																dir,
+																'src/auth.ts'
+															);
+
+															let authFile = (
+																await fs.readFile(authPath)
+															).toString();
+
+															authFile = authFile.replace(
+																`import { SvelteKitAuth } from '@auth/sveltekit';`,
+																`import { SvelteKitAuth } from '@auth/sveltekit';\r\nimport GitHub from "@auth/sveltekit/providers/github"`
+															);
+
+															await fs.writeFile(authPath, authFile);
+														},
+														startMessage:
+															'Setting up @auth/sveltekit/providers/github',
+														endMessage:
+															'Set up @auth/sveltekit/providers/github',
+													},
+												},
+												{
+													name: 'Google',
+													select: {
+														run: async ({ dir }) => {
+															const envPath = path.join(dir, '.env');
+
+															let envFile = (
+																await fs.readFile(envPath)
+															).toString();
+
+															envFile =
+																envFile +
+																`\r\n# Setup Google app here https://console.cloud.google.com/apis/credentials\r\nAUTH_GOOGLE_ID\r\nAUTH_GOOGLE_SECRET`;
+
+															await fs.writeFile(envPath, envFile);
+
+															const authPath = path.join(
+																dir,
+																'src/auth.ts'
+															);
+
+															let authFile = (
+																await fs.readFile(authPath)
+															).toString();
+
+															authFile = authFile.replace(
+																`import { SvelteKitAuth } from '@auth/sveltekit';`,
+																`import { SvelteKitAuth } from '@auth/sveltekit';\r\nimport Google from "@auth/sveltekit/providers/google"`
+															);
+
+															await fs.writeFile(authPath, authFile);
+														},
+														startMessage:
+															'Setting up @auth/sveltekit/providers/google',
+														endMessage:
+															'Set up @auth/sveltekit/providers/google',
+													},
+												},
+												{
+													name: 'Apple',
+													select: {
+														run: async ({ dir }) => {
+															const envPath = path.join(dir, '.env');
+
+															let envFile = (
+																await fs.readFile(envPath)
+															).toString();
+
+															envFile =
+																envFile +
+																`\r\n# Setup Apple app here https://authjs.dev/getting-started/providers/apple\r\nAUTH_APPLE_ID\r\nAUTH_APPLE_SECRET`;
+
+															await fs.writeFile(envPath, envFile);
+
+															const authPath = path.join(
+																dir,
+																'src/auth.ts'
+															);
+
+															let authFile = (
+																await fs.readFile(authPath)
+															).toString();
+
+															authFile = authFile.replace(
+																`import { SvelteKitAuth } from '@auth/sveltekit';`,
+																`import { Apple } from '@auth/sveltekit';\r\nimport Google from "@auth/sveltekit/providers/apple"`
+															);
+
+															await fs.writeFile(authPath, authFile);
+														},
+														startMessage:
+															'Setting up @auth/sveltekit/providers/google',
+														endMessage:
+															'Set up @auth/sveltekit/providers/google',
+													},
+												},
+											],
+											result: {
+												run: async (result, { dir }) => {
+													if (!Array.isArray(result)) return;
+
+													const authPath = path.join(dir, 'src/auth.ts');
+
+													let authFile = (
+														await fs.readFile(authPath)
+													).toString();
+
+													authFile = authFile.replace(
+														`providers: []`,
+														`providers: [${result.join(',')}]`
+													);
+
+													await fs.writeFile(authPath, authFile);
+												},
+												startMessage: 'Setting up src/auth.ts',
+												endMessage: 'Set up src/auth.ts',
+											},
+										},
+									];
+								},
+								startMessage: 'Installing @auth/sveltekit',
+								endMessage: 'Installed @auth/sveltekit',
+							},
+						},
+						{
 							name: 'Threlte',
 							select: {
 								run: async ({ dir }) => {
