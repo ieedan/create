@@ -1,20 +1,22 @@
 import fs from 'fs-extra';
 import path from 'node:path';
-import { create, Template, util } from 'template-factory';
+import { create, CreateOptions, Template, util } from 'template-factory';
 import color from 'chalk';
 import { execa } from 'execa';
 import { addDependencies, removeDependency } from './util';
+import { SveltekitTemplateState } from './types';
 
 const main = async () => {
 	const pm = 'npm';
 
 	// define the project templates inside of `/templates` here
-	const templates: Template[] = [
+	const templates = [
 		{
 			name: 'SvelteKit',
 			flag: 'sveltekit',
 			path: util.relative('../templates/sveltekit', import.meta.url),
-			excludeFiles: ['README.md', 'package-lock.json', 'node_modules', 'template-files'],
+			excludeFiles: ['package-lock.json', 'node_modules', 'template-files'],
+			state: { installedDependencies: false, addedProviders: [] },
 			prompts: [
 				{
 					kind: 'select',
@@ -403,7 +405,7 @@ const main = async () => {
 												},
 											],
 											result: {
-												run: async (result, { dir }) => {
+												run: async (result, { dir, state }) => {
 													if (!Array.isArray(result)) return;
 
 													const authPath = path.join(dir, 'src/auth.ts');
@@ -418,6 +420,8 @@ const main = async () => {
 													);
 
 													await fs.writeFile(authPath, authFile);
+
+													state.addedProviders = result;
 												},
 												startMessage: 'Setting up src/auth.ts',
 												endMessage: 'Set up src/auth.ts',
@@ -477,10 +481,12 @@ const main = async () => {
 					kind: 'confirm',
 					message: 'Install dependencies?',
 					yes: {
-						run: async ({ dir }) => {
+						run: async ({ dir, state }) => {
 							await execa({
 								cwd: dir,
 							})`${pm} install`;
+
+							state.installedDependencies = true;
 						},
 						startMessage: 'Installing dependencies',
 						endMessage: 'Installed dependencies',
@@ -536,7 +542,34 @@ This project was created for you with the help of [template-factory](https://git
 					await fs.writeFile(path.join(dir, file.name), file.content);
 				}
 			},
-		},
+			completed: async ({ state, projectName }) => {
+				let nextSteps = `Next steps:
+   1. ${color.cyan(`cd ${projectName}`)}`;
+
+				let step = 2;
+
+				if (!state.installedDependencies) {
+					nextSteps = nextSteps + `\n   2. ${color.cyan(`npm install`)}`;
+					step++;
+				}
+
+				if (state.addedProviders.length > 0) {
+					nextSteps =
+						nextSteps +
+						`\n   ${step}. Configure providers (${state.addedProviders.join(', ')}) in .env`;
+
+					step++;
+				}
+
+				nextSteps = nextSteps + `\n   ${step}. ${color.cyan(`npm run dev -- --open`)}`;
+
+				step++;
+
+				nextSteps += '\n';
+
+				console.log(nextSteps);
+			},
+		} satisfies Template<SveltekitTemplateState>,
 		{
 			name: 'template-factory Project',
 			flag: 'template-factory',
@@ -707,7 +740,7 @@ This project was created for you with the help of [template-factory](https://git
 					],
 				},
 			],
-		},
+		} satisfies Template<unknown>,
 	];
 
 	// get version from package.json
@@ -718,7 +751,7 @@ This project was created for you with the help of [template-factory](https://git
 	// create template
 	await create({
 		appName: name,
-		templates,
+		templates: templates,
 		version,
 		customization: {
 			intro: async ({ appName, version }) => {
@@ -730,7 +763,7 @@ This project was created for you with the help of [template-factory](https://git
 				return color.green('All done!');
 			},
 		},
-	});
+	} as CreateOptions);
 };
 
 main();
