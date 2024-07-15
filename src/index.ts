@@ -541,7 +541,7 @@ This project was created for you with the help of [template-factory](https://git
 			name: 'template-factory Project',
 			flag: 'template-factory',
 			path: util.relative('../templates/template-factory', import.meta.url),
-			excludeFiles: ['package-lock.json', 'README.md', 'node_modules', 'template-files'],
+			excludeFiles: ['package-lock.json', 'node_modules', 'template-files'],
 			prompts: [
 				{
 					kind: 'confirm',
