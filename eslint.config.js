@@ -12,7 +12,7 @@ export default [
 		},
 	},
 	{
-		ignores: ['dist'],
+		ignores: ['dist', 'templates', 'node_modules'],
 	},
 	pluginJs.configs.recommended,
 	...tseslint.configs.recommended,
