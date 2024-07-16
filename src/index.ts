@@ -683,7 +683,7 @@ const main = async () => {
 							await execa({
 								cwd: dir,
 							})`${pm} install`;
-							
+
 							state.installedDependencies = true;
 						},
 						startMessage: 'Installing dependencies',
