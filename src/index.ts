@@ -310,11 +310,6 @@ const main = async () => {
 										import.meta.url
 									);
 
-									const templateComponentIconsDir = util.relative(
-										'../templates/sveltekit/template-files/Auth.js/components/icons',
-										import.meta.url
-									);
-
 									const componentIconsDir = path.join(
 										dir,
 										'src/lib/components/icons'
@@ -362,243 +357,167 @@ const main = async () => {
 										{
 											kind: 'multiselect',
 											message: 'Add OAuth providers?',
-											options: [
-												{
-													name: 'GitHub',
-													select: {
-														run: async ({ dir }) => {
-															const envPath = path.join(dir, '.env');
-
-															let envFile = (
-																await fs.readFile(envPath)
-															).toString();
-
-															envFile =
-																envFile +
-																`\r\n# Setup GitHub app here https://github.com/settings/applications/new\r\nAUTH_GITHUB_ID\r\nAUTH_GITHUB_SECRET`;
-
-															await fs
-																.writeFile(envPath, envFile)
-																.catch((err) => error(err));
-
-															const providersPath = path.join(
-																dir,
-																'src/lib/auth/providers.ts'
-															);
-
-															let providersFile = (
-																await fs.readFile(providersPath)
-															).toString();
-
-															providersFile = providersFile.replace(
-																`import type { Provider } from '@auth/sveltekit/providers';`,
-																`import type { Provider } from '@auth/sveltekit/providers';\r\nimport GitHub from '@auth/sveltekit/providers/github';`
-															);
-
-															await fs
-																.writeFile(
-																	providersPath,
-																	providersFile
-																)
-																.catch((err) => error(err));
-
-															await fs
-																.copy(
-																	path.join(
-																		templateAssetIconsDir,
-																		'github-dark.svg'
-																	),
-																	path.join(
-																		assetIconsDir,
-																		'github-dark.svg'
-																	)
-																)
-																.catch((err) => error(err));
-
-															await fs
-																.copy(
-																	path.join(
-																		templateAssetIconsDir,
-																		'github-light.svg'
-																	),
-																	path.join(
-																		assetIconsDir,
-																		'github-light.svg'
-																	)
-																)
-																.catch((err) => error(err));
-
-															await fs
-																.copy(
-																	path.join(
-																		templateComponentIconsDir,
-																		'github.svelte'
-																	),
-																	path.join(
-																		componentIconsDir,
-																		'github.svelte'
-																	)
-																)
-																.catch((err) => error(err));
-														},
-														startMessage:
-															'Setting up @auth/sveltekit/providers/github',
-														endMessage:
-															'Set up @auth/sveltekit/providers/github',
+											options: (
+												[
+													{
+														name: 'Apple',
+														iconVariants: true,
+														docs: 'https://developer.apple.com/sign-in-with-apple/get-started/',
 													},
-												},
-												{
-													name: 'Google',
-													select: {
-														run: async ({ dir }) => {
-															const envPath = path.join(dir, '.env');
-
-															let envFile = (
-																await fs.readFile(envPath)
-															).toString();
-
-															envFile =
-																envFile +
-																`\r\n# Setup Google app here https://console.cloud.google.com/apis/credentials\r\nAUTH_GOOGLE_ID\r\nAUTH_GOOGLE_SECRET`;
-
-															await fs
-																.writeFile(envPath, envFile)
-																.catch((err) => error(err));
-
-															const providersPath = path.join(
-																dir,
-																'src/lib/auth/providers.ts'
-															);
-
-															let providersFile = (
-																await fs.readFile(providersPath)
-															).toString();
-
-															providersFile = providersFile.replace(
-																`import type { Provider } from '@auth/sveltekit/providers';`,
-																`import type { Provider } from '@auth/sveltekit/providers';\r\nimport Google from '@auth/sveltekit/providers/google';`
-															);
-
-															await fs.writeFile(
-																providersPath,
-																providersFile
-															);
-
-															await fs
-																.copy(
-																	path.join(
-																		templateAssetIconsDir,
-																		'google.svg'
-																	),
-																	path.join(
-																		assetIconsDir,
-																		'google.svg'
-																	)
-																)
-																.catch((err) => error(err));
-
-															await fs
-																.copy(
-																	path.join(
-																		templateComponentIconsDir,
-																		'google.svelte'
-																	),
-																	path.join(
-																		componentIconsDir,
-																		'google.svelte'
-																	)
-																)
-																.catch((err) => error(err));
-														},
-														startMessage:
-															'Setting up @auth/sveltekit/providers/google',
-														endMessage:
-															'Set up @auth/sveltekit/providers/google',
+													{
+														name: 'Discord',
+														iconVariants: false,
+														docs: 'https://discord.com/developers/applications',
 													},
-												},
-												{
-													name: 'Apple',
-													select: {
-														run: async ({ dir }) => {
-															const envPath = path.join(dir, '.env');
-
-															let envFile = (
-																await fs.readFile(envPath)
-															).toString();
-
-															envFile =
-																envFile +
-																`\r\n# Setup Apple app here https://authjs.dev/getting-started/providers/apple\r\nAUTH_APPLE_ID\r\nAUTH_APPLE_SECRET`;
-
-															await fs
-																.writeFile(envPath, envFile)
-																.catch((err) => error(err));
-
-															const providersPath = path.join(
-																dir,
-																'src/lib/auth/providers.ts'
-															);
-
-															let providersFile = (
-																await fs.readFile(providersPath)
-															).toString();
-
-															providersFile = providersFile.replace(
-																`import type { Provider } from '@auth/sveltekit/providers';`,
-																`import type { Provider } from '@auth/sveltekit/providers';\r\nimport Apple from '@auth/sveltekit/providers/apple';`
-															);
-
-															await fs.writeFile(
-																providersPath,
-																providersFile
-															);
-
-															await fs
-																.copy(
-																	path.join(
-																		templateAssetIconsDir,
-																		'apple-dark.svg'
-																	),
-																	path.join(
-																		assetIconsDir,
-																		'apple-dark.svg'
-																	)
-																)
-																.catch((err) => error(err));
-
-															await fs
-																.copy(
-																	path.join(
-																		templateAssetIconsDir,
-																		'apple-light.svg'
-																	),
-																	path.join(
-																		assetIconsDir,
-																		'apple-light.svg'
-																	)
-																)
-																.catch((err) => error(err));
-
-															await fs
-																.copy(
-																	path.join(
-																		templateComponentIconsDir,
-																		'apple.svelte'
-																	),
-																	path.join(
-																		componentIconsDir,
-																		'apple.svelte'
-																	)
-																)
-																.catch((err) => error(err));
-														},
-														startMessage:
-															'Setting up @auth/sveltekit/providers/apple',
-														endMessage:
-															'Set up @auth/sveltekit/providers/apple',
+													{
+														name: 'Facebook',
+														iconVariants: false,
+														docs: 'https://developers.facebook.com/apps/',
 													},
+													{
+														name: 'GitHub',
+														iconVariants: true,
+														docs: 'https://github.com/settings/applications/new',
+													},
+													{
+														name: 'Google',
+														iconVariants: false,
+														docs: 'https://console.cloud.google.com/apis/credentials',
+													},
+													{
+														name: 'GitLab',
+														iconVariants: false,
+														docs: 'https://docs.gitlab.com/ee/api/oauth2.html',
+													},
+													{
+														name: 'Reddit',
+														iconVariants: false,
+														docs: 'https://www.reddit.com/prefs/apps/',
+													},
+													{
+														name: 'Slack',
+														iconVariants: false,
+														docs: 'https://api.slack.com/apps',
+													},
+												] satisfies {
+													name: string;
+													iconVariants: boolean;
+													docs: string;
+												}[]
+											).map((provider) => ({
+												name: provider.name,
+												select: {
+													run: async ({ dir }) => {
+														const envPath = path.join(dir, '.env');
+
+														let envFile = (
+															await fs.readFile(envPath)
+														).toString();
+
+														envFile =
+															envFile +
+															`\r\n# Setup ${provider.name} app here ${provider.docs}` +
+															`\r\nAUTH_${provider.name.toUpperCase()}_ID` +
+															`\r\nAUTH_${provider.name.toUpperCase()}_SECRET`;
+
+														await fs
+															.writeFile(envPath, envFile)
+															.catch((err) => error(err));
+
+														const providersPath = path.join(
+															dir,
+															'src/lib/auth/providers.ts'
+														);
+
+														let providersFile = (
+															await fs.readFile(providersPath)
+														).toString();
+
+														providersFile = providersFile.replace(
+															`import type { Provider } from '@auth/sveltekit/providers';`,
+															`import type { Provider } from '@auth/sveltekit/providers';` +
+																`\r\nimport ${provider.name} from '@auth/sveltekit/providers/${provider.name.toLowerCase()}';`
+														);
+
+														await fs
+															.writeFile(providersPath, providersFile)
+															.catch((err) => error(err));
+
+														let iconComponent = '';
+
+														if (provider.iconVariants) {
+															await fs
+																.copy(
+																	path.join(
+																		templateAssetIconsDir,
+																		`${provider.name.toLowerCase()}-dark.svg`
+																	),
+																	path.join(
+																		assetIconsDir,
+																		`${provider.name.toLowerCase()}-dark.svg`
+																	)
+																)
+																.catch((err) => error(err));
+
+															await fs
+																.copy(
+																	path.join(
+																		templateAssetIconsDir,
+																		`${provider.name.toLowerCase()}-light.svg`
+																	),
+																	path.join(
+																		assetIconsDir,
+																		`${provider.name.toLowerCase()}-light.svg`
+																	)
+																)
+																.catch((err) => error(err));
+
+															iconComponent = `<script lang="ts">
+    import dark from "$lib/assets/icons/${provider.name.toLowerCase()}-dark.svg"
+    import light from "$lib/assets/icons/${provider.name.toLowerCase()}-light.svg"
+    import { mode } from "mode-watcher"
+</script>
+
+{#if $mode == "light"}
+    <img src={light} alt="${provider.name} logo" {...$$restProps}>
+{:else}
+    <img src={dark} alt="${provider.name} logo" {...$$restProps}>
+{/if}
+`;
+														} else {
+															await fs
+																.copy(
+																	path.join(
+																		templateAssetIconsDir,
+																		`${provider.name.toLowerCase()}.svg`
+																	),
+																	path.join(
+																		assetIconsDir,
+																		`${provider.name.toLowerCase()}.svg`
+																	)
+																)
+																.catch((err) => error(err));
+
+															iconComponent = `<script lang="ts">
+																import logo from "$lib/assets/icons/${provider.name.toLowerCase()}.svg"
+															</script>
+															
+															<img src={logo} alt="${provider.name} logo" {...$$restProps}>
+															`;
+														}
+
+														await fs.writeFile(
+															path.join(
+																componentIconsDir,
+																`${provider.name.toLowerCase()}.svelte`
+															),
+															iconComponent
+														);
+													},
+													startMessage: `Setting up @auth/sveltekit/providers/${provider.name.toLowerCase()}`,
+													endMessage: `Set up @auth/sveltekit/providers/${provider.name.toLowerCase()}`,
 												},
-											],
+											})),
 											result: {
 												run: async (result, { dir, state, error }) => {
 													if (!Array.isArray(result)) return;
@@ -630,7 +549,7 @@ const main = async () => {
 													).toString();
 
 													signInContent = signInContent.replace(
-														'import { GitHub, Google, Apple } from "$lib/components/icons";',
+														'// put icon imports here',
 														`import { ${result.join(', ')} } from '$lib/components/icons';`
 													);
 
@@ -676,7 +595,7 @@ const main = async () => {
 
 													const exportFile =
 														mappedImports.join('\r\n') +
-														`\r\nexport { ${result.join(', ')} };`;
+														`\r\n\r\nexport { ${result.join(', ')} };`;
 
 													await fs
 														.writeFile(
@@ -818,7 +737,7 @@ This project was created for you with the help of [template-factory](https://git
 				if (state.addedProviders.length > 0) {
 					nextSteps =
 						nextSteps +
-						`\n   ${step}. Configure providers (${state.addedProviders.join(', ')}) in .env`;
+						`\n   ${step}. Configure providers (${state.addedProviders.join(', ')}) in .env. See the Auth.js docs https://authjs.dev/getting-started/authentication/oauth`;
 
 					step++;
 				}

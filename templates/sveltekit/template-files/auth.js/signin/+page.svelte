@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { providerMap } from '$lib/auth/providers';
 	import { SignIn } from '@auth/sveltekit/components';
-	import { GitHub, Google, Apple } from "$lib/components/icons";
+	// put icon imports here
 </script>
 
 <div class="flex h-svh place-items-center justify-center">
