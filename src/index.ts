@@ -207,6 +207,20 @@ const main = async () => {
 									// create auth directory
 
 									await fs
+										.mkdir(path.join(dir, 'src/routes/dashboard'), {
+											recursive: true,
+										})
+										.catch((err) => error(err));
+
+									await fs.copy(
+										util.relative(
+											'../templates/sveltekit/template-files/Auth.js/routes/dashboard/+page.svelte',
+											import.meta.url
+										),
+										path.join(dir, 'src/routes/dashboard/+page.svelte')
+									);
+
+									await fs
 										.mkdir(path.join(dir, 'src/lib/auth'), { recursive: true })
 										.catch((err) => error(err));
 
@@ -239,7 +253,7 @@ const main = async () => {
 									await fs.copy(hooksPath, path.join(dir, 'src/hooks.server.ts'));
 
 									const signinPath = util.relative(
-										'../templates/sveltekit/template-files/Auth.js/signin',
+										'../templates/sveltekit/template-files/Auth.js/routes/signin',
 										import.meta.url
 									);
 
@@ -270,7 +284,7 @@ const main = async () => {
 										.catch((err) => error(err));
 
 									const signoutPath = util.relative(
-										'../templates/sveltekit/template-files/Auth.js/signout/+page.server.ts',
+										'../templates/sveltekit/template-files/Auth.js/routes/signout/+page.server.ts',
 										import.meta.url
 									);
 
@@ -290,7 +304,7 @@ const main = async () => {
 									await fs
 										.copy(
 											util.relative(
-												'../templates/sveltekit/template-files/Auth.js/+page.svelte',
+												'../templates/sveltekit/template-files/Auth.js/routes/+page.svelte',
 												import.meta.url
 											),
 											path.join(dir, 'src/routes/+page.svelte')
@@ -300,7 +314,7 @@ const main = async () => {
 									await fs
 										.copy(
 											util.relative(
-												'../templates/sveltekit/template-files/Auth.js/+layout.server.ts',
+												'../templates/sveltekit/template-files/Auth.js/routes/+layout.server.ts',
 												import.meta.url
 											),
 											path.join(dir, 'src/routes/+layout.server.ts')
@@ -382,14 +396,14 @@ const main = async () => {
 														docs: 'https://github.com/settings/applications/new',
 													},
 													{
-														name: 'Google',
-														iconVariants: false,
-														docs: 'https://console.cloud.google.com/apis/credentials',
-													},
-													{
 														name: 'GitLab',
 														iconVariants: false,
 														docs: 'https://docs.gitlab.com/ee/api/oauth2.html',
+													},
+													{
+														name: 'Google',
+														iconVariants: false,
+														docs: 'https://console.cloud.google.com/apis/credentials',
 													},
 													{
 														name: 'Reddit',
@@ -559,7 +573,8 @@ const main = async () => {
 														(provider, index) => {
 															if (index == 0) {
 																return `{#if provider.name == '${provider}'}
-						<${provider} class="size-5"/>`;
+						<${provider} class="size-5"/>
+					${index == result.length - 1 ? '{/if}' : ''}`;
 															}
 
 															if (index == result.length - 1) {
@@ -606,8 +621,8 @@ const main = async () => {
 														)
 														.catch((err) => error(err));
 												},
-												startMessage: 'Setting up custom sign in page',
-												endMessage: 'Set up custom sign in page',
+												startMessage: 'Setting up sign in page',
+												endMessage: 'Set up sign in page',
 											},
 										},
 									];
@@ -660,7 +675,21 @@ const main = async () => {
 						},
 					],
 				},
-				installDependencies({ pm: 'npm', choosePackageManager: false }),
+				{
+					kind: 'confirm',
+					message: 'Install dependencies?',
+					yes: {
+						run: async ({ dir, state }) => {
+							await execa({
+								cwd: dir,
+							})`${pm} install`;
+							
+							state.installedDependencies = true;
+						},
+						startMessage: 'Installing dependencies',
+						endMessage: 'Installed dependencies',
+					},
+				},
 			],
 			templateFiles: [
 				{

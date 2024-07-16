@@ -14,10 +14,17 @@ declare module '@auth/sveltekit' {
 		} & DefaultSession['user'];
 	}
 }
- 
+
+export const getRedirectTo = (url: URL) => {
+	const fullPath = url.pathname + url.search;
+	if (fullPath == '/') return '/';
+
+	return encodeURIComponent(fullPath);
+};
+
 export const { handle, signIn, signOut } = SvelteKitAuth({
-    providers,
-    trustHost: true,
+	providers,
+	trustHost: true,
 	pages: {
 		signIn: '/signin'
 	},
