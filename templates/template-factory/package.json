@@ -19,6 +19,6 @@
 	"license": "ISC",
 	"dependencies": {
 		"fs-extra": "^11.2.0",
-		"template-factory": "^0.1.7"
+		"template-factory": "^0.2.0"
 	}
 }

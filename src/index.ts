@@ -1,6 +1,8 @@
 import fs from 'fs-extra';
 import path from 'node:path';
-import { create, CreateOptions, Template, util } from 'template-factory';
+import { create, CreateOptions, Template } from 'template-factory';
+import * as util from 'template-factory/util';
+import { installDependencies } from 'template-factory/plugins/js/prompts';
 import color from 'chalk';
 import { execa } from 'execa';
 import { addDependencies, removeDependency } from './util';
@@ -658,21 +660,7 @@ const main = async () => {
 						},
 					],
 				},
-				{
-					kind: 'confirm',
-					message: 'Install dependencies?',
-					yes: {
-						run: async ({ dir, state }) => {
-							await execa({
-								cwd: dir,
-							})`${pm} install`;
-
-							state.installedDependencies = true;
-						},
-						startMessage: 'Installing dependencies',
-						endMessage: 'Installed dependencies',
-					},
-				},
+				installDependencies({ pm: 'npm', choosePackageManager: false }),
 			],
 			templateFiles: [
 				{
@@ -896,19 +884,7 @@ This project was created for you with the help of [template-factory](https://git
 						endMessage: 'Set up publish workflow',
 					},
 				},
-				{
-					kind: 'confirm',
-					message: 'Install dependencies?',
-					yes: {
-						run: async ({ dir }) => {
-							await execa({
-								cwd: dir,
-							})`${pm} install`;
-						},
-						startMessage: 'Installing dependencies',
-						endMessage: 'Installed dependencies',
-					},
-				},
+				installDependencies({ pm: 'npm', choosePackageManager: false })
 			],
 			templateFiles: [
 				{
