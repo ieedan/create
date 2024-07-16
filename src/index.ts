@@ -884,7 +884,7 @@ This project was created for you with the help of [template-factory](https://git
 						endMessage: 'Set up publish workflow',
 					},
 				},
-				installDependencies({ pm: 'npm', choosePackageManager: false })
+				installDependencies({ pm: 'npm', choosePackageManager: false }),
 			],
 			templateFiles: [
 				{
