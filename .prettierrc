@@ -3,5 +3,14 @@
 	"tabWidth": 4,
 	"singleQuote": true,
 	"trailingComma": "es5",
-	"printWidth": 100
+	"printWidth": 100,
+	"overrides": [
+		{
+			"files": "src/index.ts",
+			"options": {
+				"useTabs": false,
+				"tabWidth": 2
+			}
+		}
+	]
 }

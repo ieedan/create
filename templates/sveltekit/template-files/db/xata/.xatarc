@@ -1,0 +1,6 @@
+{
+  "databaseURL": "YOUR_DATA_BASE_URL",
+  "codegen": {
+    "output": "src/lib/db/xata.ts"
+  }
+}

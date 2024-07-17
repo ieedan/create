@@ -1,0 +1,6 @@
+{
+  "databaseURL": "https://Aidan-Bleser-s-workspace-tbp85o.us-east-1.xata.sh/db/not-alone",
+  "codegen": {
+    "output": "src/lib/db/xata.ts"
+  }
+}
