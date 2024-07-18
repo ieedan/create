@@ -8,6 +8,7 @@ import color from 'chalk';
 import { execa } from 'execa';
 import { SveltekitTemplateState } from './types';
 import { packages } from './packages';
+import { addScript } from './util';
 
 const main = async () => {
 	const pm = 'npm';
@@ -627,6 +628,194 @@ const main = async () => {
 						{
 							name: 'Turso',
 							hint: 'Free, 500 DBs, 9GB total storage, 1B row reads',
+							select: {
+								run: async ({ dir, state }) => {
+									state.usingDatabase = 'turso';
+
+									const envPath = path.join(dir, '.env');
+
+									let existed = true;
+
+									if (!(await fs.exists(envPath))) {
+										existed = false;
+										await fs.createFile(envPath);
+									}
+
+									let envContent = (await fs.readFile(envPath)).toString();
+
+									envContent =
+										envContent +
+										`${existed ? `\r\n` : ''}TURSO_DATABASE_URL=\r\nTURSO_AUTH_TOKEN=`;
+
+									await fs.writeFile(envPath, envContent);
+
+									return [
+										{
+											kind: 'confirm',
+											message: 'Setup database URL?',
+											yes: {
+												run: async () => {
+													return [
+														{
+															kind: 'text',
+															message: 'What is your database url?',
+															placeholder: '(right click to paste)',
+															validate: (dbUrl) => {
+																// libsql://testing-ieedan.turso.io
+																if (dbUrl == '')
+																	return 'Please enter a database URL.';
+
+																if (!dbUrl.startsWith('libsql://'))
+																	return 'Please enter a valid database URL';
+
+																if (!dbUrl.endsWith('turso.io'))
+																	return 'The database url must have a turso domain.';
+															},
+															result: {
+																run: async (result) => {
+																	let content = (
+																		await fs.readFile(envPath)
+																	).toString();
+
+																	content = content.replace(
+																		'TURSO_DATABASE_URL=',
+																		`TURSO_DATABASE_URL="${result}"`
+																	);
+
+																	await fs.writeFile(
+																		envPath,
+																		content
+																	);
+																},
+															},
+														},
+													];
+												},
+											},
+										},
+										{
+											kind: 'confirm',
+											message: 'Setup API Key?',
+											yes: {
+												run: async () => {
+													return [
+														{
+															kind: 'password',
+															message: `Enter your API key`,
+															validate: (key) => {
+																if (key == '')
+																	return 'Please enter your API key.';
+															},
+															result: {
+																run: async (result) => {
+																	let envContent = (
+																		await fs.readFile(envPath)
+																	).toString();
+
+																	envContent = envContent.replace(
+																		'TURSO_AUTH_TOKEN=',
+																		`TURSO_AUTH_TOKEN="${result}"`
+																	);
+
+																	await fs.writeFile(
+																		envPath,
+																		envContent
+																	);
+																},
+															},
+														},
+													];
+												},
+											},
+										},
+										{
+											kind: 'select',
+											message: 'What ORM would you like to use?',
+											initialValue: 'Drizzle',
+											options: [
+												{
+													name: 'Drizzle',
+													hint: 'https://orm.drizzle.team/',
+													select: {
+														run: async ({ error }) => {
+															await addDependencies(
+																dir,
+																packages['drizzle-orm'],
+																packages['@libsql/client'],
+																packages['drizzle-kit'],
+																packages['dotenv']
+															);
+
+															await fs
+																.copy(
+																	util.relative(
+																		'../templates/sveltekit/template-files/db/turso/drizzle/db/db.ts',
+																		import.meta.url
+																	),
+																	path.join(
+																		dir,
+																		'src/lib/db/db.ts'
+																	)
+																)
+																.catch((err) => error(err));
+
+															await fs
+																.copy(
+																	util.relative(
+																		'../templates/sveltekit/template-files/db/turso/drizzle/db/schema.ts',
+																		import.meta.url
+																	),
+																	path.join(
+																		dir,
+																		'src/lib/db/schema.ts'
+																	)
+																)
+																.catch((err) => error(err));
+
+															await fs
+																.copy(
+																	util.relative(
+																		'../templates/sveltekit/template-files/db/turso/drizzle/drizzle.config.ts',
+																		import.meta.url
+																	),
+																	path.join(
+																		dir,
+																		'drizzle.config.ts'
+																	)
+																)
+																.catch((err) => error(err));
+
+															await fs
+																.copy(
+																	util.relative(
+																		'../templates/sveltekit/template-files/db/turso/drizzle/migrate.ts',
+																		import.meta.url
+																	),
+																	path.join(dir, 'migrate.ts')
+																)
+																.catch((err) => error(err));
+
+															await addScript(dir, {
+																name: 'migrations:run',
+																script: 'npx tsx migrate.ts',
+															});
+
+															await addScript(dir, {
+																name: 'migrations:generate',
+																script: 'drizzle-kit generate',
+															});
+														},
+														startMessage:
+															'Installing and configuring drizzle-orm for Turso',
+														endMessage:
+															'Installed and configured drizzle-orm for Turso',
+													},
+												},
+											],
+										},
+									];
+								},
+							},
 						},
 						{
 							name: 'Xata',
@@ -759,10 +948,6 @@ const main = async () => {
 																		envContent
 																	);
 																},
-																startMessage:
-																	'Adding your API key to the .env file.',
-																endMessage:
-																	'Added your API key to the .env file.',
 															},
 														},
 													];
@@ -800,6 +985,10 @@ const main = async () => {
 																.catch((err) => error(err));
 														},
 													},
+													startMessage:
+														'Installing and configuring drizzle-orm for Xata',
+													endMessage:
+														'Installed and configured drizzle-orm for Xata',
 												},
 												{
 													name: 'Kysely',
@@ -965,8 +1154,7 @@ This project was created for you with the help of [template-factory](https://git
 				}
 			},
 			completed: async ({ state, projectName }) => {
-				let nextSteps = `Next steps:
-   1. ${color.cyan(`cd ${projectName}`)}`;
+				let nextSteps = `Next steps:\n   1. ${color.cyan(`cd ${projectName}`)}`;
 
 				let step = 2;
 
@@ -981,6 +1169,36 @@ This project was created for you with the help of [template-factory](https://git
 						`\n   ${step}. Configure providers (${state.addedProviders.join(', ')}) in .env. See the Auth.js docs https://authjs.dev/getting-started/authentication/oauth`;
 
 					step++;
+				}
+
+				if (state.usingDatabase) {
+					if (state.usingDatabase == 'turso') {
+						nextSteps =
+							nextSteps +
+							`\n   ${step}. Create your schema in ${color.cyan('src/lib/db/schema.ts')}`;
+						step++;
+						nextSteps =
+							nextSteps +
+							`\n   ${step}. Run ${color.cyan('npm run migrations:generate')} to generate migrations`;
+						step++;
+						nextSteps =
+							nextSteps +
+							`\n   ${step}. Run ${color.cyan('npm run migrations:run')} to run migrations`;
+						step++;
+					} else if (state.usingDatabase == 'xata') {
+						nextSteps =
+							nextSteps +
+							`\n   ${step}. Install the Xata CLI ${color.cyan(`npm install -g '@xata.io/cli'`)}`;
+						step++;
+						nextSteps =
+							nextSteps +
+							`\n   ${step}. Authenticate with ${color.cyan(`xata auth login`)}`;
+						step++;
+						nextSteps =
+							nextSteps +
+							`\n   ${step}. Generate schema from database with ${color.cyan(`xata pull main`)}`;
+						step++;
+					}
 				}
 
 				nextSteps = nextSteps + `\n   ${step}. ${color.cyan(`npm run dev -- --open`)}`;
@@ -1018,14 +1236,15 @@ This project was created for you with the help of [template-factory](https://git
 
 							await fs.copy(buildConfigPath, path.join(dir, 'build.config.ts'));
 
-							const packagePath = path.join(dir, 'package.json');
+							await addScript(dir, {
+								name: 'start',
+								script: 'unbuild && node bin.mjs',
+							});
 
-							const pkg = JSON.parse((await fs.readFile(packagePath)).toString());
-
-							pkg.scripts.start = 'unbuild && node bin.mjs';
-							pkg.scripts.build = 'unbuild';
-
-							await fs.writeFile(packagePath, JSON.stringify(pkg, null, 2));
+							await addScript(dir, {
+								name: 'build',
+								script: 'unbuild',
+							});
 
 							const tsConfigPath = util.relative(
 								'../templates/template-factory/template-files/tsconfig.json',
@@ -1061,13 +1280,7 @@ This project was created for you with the help of [template-factory](https://git
 					},
 					no: {
 						run: async ({ dir }) => {
-							const packagePath = path.join(dir, 'package.json');
-
-							const pkg = JSON.parse((await fs.readFile(packagePath)).toString());
-
-							pkg.scripts.start = 'node bin.mjs';
-
-							await fs.writeFile(packagePath, JSON.stringify(pkg, null, 2));
+							await addScript(dir, { name: 'start', script: 'node bin.mjs' });
 
 							const gitignore = `node_modules`;
 
@@ -1106,13 +1319,10 @@ This project was created for you with the help of [template-factory](https://git
 
 							await fs.writeFile(path.join(dir, '.prettierignore'), 'templates');
 
-							const packagePath = path.join(dir, 'package.json');
-
-							const pkg = JSON.parse((await fs.readFile(packagePath)).toString());
-
-							pkg.scripts.format = 'npx prettier . --write';
-
-							await fs.writeFile(packagePath, JSON.stringify(pkg, null, 2));
+							await addScript(dir, {
+								name: 'format',
+								script: 'npx prettier . --write',
+							});
 						},
 						startMessage: 'Setting up prettier',
 						endMessage: 'Set up prettier',

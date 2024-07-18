@@ -128,4 +128,14 @@ export const packages: Record<string, Package> = {
 		scope: 'dev',
 		version: '^3.3.3',
 	},
+	'drizzle-kit': {
+		name: 'drizzle-kit',
+		scope: 'dev',
+		version: '^0.23.0',
+	},
+	'@libsql/client': {
+		name: '@libsql/client',
+		scope: 'regular',
+		version: '^0.7.0',
+	},
 };
