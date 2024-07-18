@@ -1,6 +1,6 @@
 {
 	"name": "@iedan/create",
-	"version": "1.0.22",
+	"version": "1.0.23",
 	"description": "Project templates to quickly spin up projects the way I like to build them.",
 	"main": "./dist/index.mjs",
 	"module": "./dist/index.mjs",
