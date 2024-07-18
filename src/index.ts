@@ -3,10 +3,12 @@ import path from 'node:path';
 import { create, CreateOptions, Template } from 'template-factory';
 import * as util from 'template-factory/util';
 import { installDependencies } from 'template-factory/plugins/js/prompts';
+import { addDependencies, removeDependencies } from 'template-factory/plugins/js/util';
 import color from 'chalk';
 import { execa } from 'execa';
-import { addDependencies, removeDependency } from './util';
 import { SveltekitTemplateState } from './types';
+import { packages } from './packages';
+import { addScript } from './util';
 
 const main = async () => {
 	const pm = 'npm';
@@ -38,15 +40,16 @@ const main = async () => {
 							name: 'Vercel',
 							select: {
 								run: async ({ dir }) => {
-									await removeDependency('@sveltejs/adapter-auto', { dir });
+									await removeDependencies(dir, '@sveltejs/adapter-auto');
 
-									await addDependencies(['@sveltejs/adapter-vercel'], 'dev', {
-										pm,
-										dir,
+									await addDependencies(dir, {
+										name: '@sveltejs/adapter-vercel',
+										scope: 'regular',
+										version: '^5.4.1',
 									});
 
 									const configPath = util.relative(
-										'../templates/sveltekit/template-files/vercel/svelte.config.js',
+										'../templates/sveltekit/template-files/deployment/vercel/svelte.config.js',
 										import.meta.url
 									);
 
@@ -62,9 +65,8 @@ const main = async () => {
 													select: {
 														run: async ({ dir }) => {
 															await addDependencies(
-																['@vercel/analytics'],
-																'dev',
-																{ pm, dir }
+																dir,
+																packages['@vercel/analytics']
 															);
 
 															const hooksPath = path.join(
@@ -74,7 +76,7 @@ const main = async () => {
 
 															if (!(await fs.exists(hooksPath))) {
 																const codePath = util.relative(
-																	'../templates/sveltekit/template-files/vercel/hooks.client.ts/+analytics/hooks.client.ts',
+																	'../templates/sveltekit/template-files/deployment/vercel/hooks.client.ts/+analytics/hooks.client.ts',
 																	import.meta.url
 																);
 
@@ -102,9 +104,8 @@ const main = async () => {
 													select: {
 														run: async ({ dir }) => {
 															await addDependencies(
-																['@vercel/speed-insights'],
-																'dev',
-																{ pm, dir }
+																dir,
+																packages['@vercel/speed-insights']
 															);
 
 															const hooksPath = path.join(
@@ -114,7 +115,7 @@ const main = async () => {
 
 															if (!(await fs.exists(hooksPath))) {
 																const codePath = util.relative(
-																	'../templates/sveltekit/template-files/vercel/hooks.client.ts/+speed-insights/hooks.client.ts',
+																	'../templates/sveltekit/template-files/deployment/vercel/hooks.client.ts/+speed-insights/hooks.client.ts',
 																	import.meta.url
 																);
 
@@ -149,15 +150,12 @@ const main = async () => {
 							name: 'IIS',
 							select: {
 								run: async ({ dir, projectName }) => {
-									await removeDependency('@sveltejs/adapter-auto', { dir });
+									await removeDependencies(dir, '@sveltejs/adapter-auto');
 
-									await addDependencies(['sveltekit-adapter-iis'], 'dev', {
-										pm,
-										dir,
-									});
+									await addDependencies(dir, packages['sveltekit-adapter-iis']);
 
 									const configPath = util.relative(
-										'../templates/sveltekit/template-files/iis/svelte.config.js',
+										'../templates/sveltekit/template-files/deployment/iis/svelte.config.js',
 										import.meta.url
 									);
 
@@ -175,34 +173,15 @@ const main = async () => {
 					initialValue: 'Auto',
 				},
 				{
-					kind: 'confirm',
-					message: 'Use sveltekit-superforms?',
-					initialValue: true,
-					yes: {
-						run: async ({ dir }) => {
-							await addDependencies(['zod', 'sveltekit-superforms'], 'regular', {
-								pm,
-								dir,
-							});
-
-							// in the future we could add some starter files down here
-						},
-						startMessage: 'Setting up sveltekit-superforms',
-						endMessage: 'Setup sveltekit-superforms',
-					},
-				},
-				{
 					kind: 'multiselect',
-					message: 'What features should be included?',
+					message: 'Would you like to setup authentication?',
+					required: false,
 					options: [
 						{
 							name: 'Auth.js',
 							select: {
 								run: async ({ dir, projectName, error }) => {
-									await addDependencies(['@auth/sveltekit'], 'regular', {
-										pm,
-										dir,
-									});
+									await addDependencies(dir, packages['@auth/sveltekit']);
 
 									// create auth directory
 
@@ -214,18 +193,20 @@ const main = async () => {
 
 									await fs.copy(
 										util.relative(
-											'../templates/sveltekit/template-files/Auth.js/routes/dashboard/+page.svelte',
+											'../templates/sveltekit/template-files/auth/Auth.js/routes/dashboard/+page.svelte',
 											import.meta.url
 										),
 										path.join(dir, 'src/routes/dashboard/+page.svelte')
 									);
 
 									await fs
-										.mkdir(path.join(dir, 'src/lib/auth'), { recursive: true })
+										.mkdir(path.join(dir, 'src/lib/auth'), {
+											recursive: true,
+										})
 										.catch((err) => error(err));
 
 									const indexPath = util.relative(
-										'../templates/sveltekit/template-files/Auth.js/auth/index.ts',
+										'../templates/sveltekit/template-files/auth/Auth.js/auth/index.ts',
 										import.meta.url
 									);
 
@@ -234,7 +215,7 @@ const main = async () => {
 										.catch((err) => error(err));
 
 									const providersPath = util.relative(
-										'../templates/sveltekit/template-files/Auth.js/auth/providers.ts',
+										'../templates/sveltekit/template-files/auth/Auth.js/auth/providers.ts',
 										import.meta.url
 									);
 
@@ -246,14 +227,14 @@ const main = async () => {
 										.catch((err) => error(err));
 
 									const hooksPath = util.relative(
-										'../templates/sveltekit/template-files/Auth.js/hooks.server.ts',
+										'../templates/sveltekit/template-files/auth/Auth.js/hooks.server.ts',
 										import.meta.url
 									);
 
 									await fs.copy(hooksPath, path.join(dir, 'src/hooks.server.ts'));
 
 									const signinPath = util.relative(
-										'../templates/sveltekit/template-files/Auth.js/routes/signin',
+										'../templates/sveltekit/template-files/auth/Auth.js/routes/signin',
 										import.meta.url
 									);
 
@@ -284,7 +265,7 @@ const main = async () => {
 										.catch((err) => error(err));
 
 									const signoutPath = util.relative(
-										'../templates/sveltekit/template-files/Auth.js/routes/signout/+page.server.ts',
+										'../templates/sveltekit/template-files/auth/Auth.js/routes/signout/+page.server.ts',
 										import.meta.url
 									);
 
@@ -304,7 +285,7 @@ const main = async () => {
 									await fs
 										.copy(
 											util.relative(
-												'../templates/sveltekit/template-files/Auth.js/routes/+page.svelte',
+												'../templates/sveltekit/template-files/auth/Auth.js/routes/+page.svelte',
 												import.meta.url
 											),
 											path.join(dir, 'src/routes/+page.svelte')
@@ -314,7 +295,7 @@ const main = async () => {
 									await fs
 										.copy(
 											util.relative(
-												'../templates/sveltekit/template-files/Auth.js/routes/+layout.server.ts',
+												'../templates/sveltekit/template-files/auth/Auth.js/routes/+layout.server.ts',
 												import.meta.url
 											),
 											path.join(dir, 'src/routes/+layout.server.ts')
@@ -322,7 +303,7 @@ const main = async () => {
 										.catch((err) => error(err));
 
 									const templateAssetIconsDir = util.relative(
-										'../templates/sveltekit/template-files/Auth.js/assets/icons',
+										'../templates/sveltekit/template-files/auth/Auth.js/assets/icons',
 										import.meta.url
 									);
 
@@ -333,7 +314,9 @@ const main = async () => {
 
 									if (!(await fs.exists(componentIconsDir))) {
 										await fs
-											.mkdir(componentIconsDir, { recursive: true })
+											.mkdir(componentIconsDir, {
+												recursive: true,
+											})
 											.catch((err) => error(err));
 									}
 
@@ -341,7 +324,9 @@ const main = async () => {
 
 									if (!(await fs.exists(assetIconsDir))) {
 										await fs
-											.mkdir(assetIconsDir, { recursive: true })
+											.mkdir(assetIconsDir, {
+												recursive: true,
+											})
 											.catch((err) => error(err));
 									}
 
@@ -351,7 +336,9 @@ const main = async () => {
 											message: "Generate auth secret and add it to '.env'?",
 											yes: {
 												run: async ({ dir }) => {
-													await execa({ cwd: dir })`npx auth secret`;
+													await execa({
+														cwd: dir,
+													})`npx auth secret`;
 												},
 												startMessage: "Setting up '.env' file for Auth.js",
 												endMessage: "Setup '.env' file for Auth.js",
@@ -489,17 +476,17 @@ const main = async () => {
 																.catch((err) => error(err));
 
 															iconComponent = `<script lang="ts">
-    import dark from "$lib/assets/icons/${provider.name.toLowerCase()}-dark.svg"
-    import light from "$lib/assets/icons/${provider.name.toLowerCase()}-light.svg"
-    import { mode } from "mode-watcher"
-</script>
-
-{#if $mode == "light"}
-    <img src={light} alt="${provider.name} logo" {...$$restProps}>
-{:else}
-    <img src={dark} alt="${provider.name} logo" {...$$restProps}>
-{/if}
-`;
+			import dark from "$lib/assets/icons/${provider.name.toLowerCase()}-dark.svg"
+			import light from "$lib/assets/icons/${provider.name.toLowerCase()}-light.svg"
+			import { mode } from "mode-watcher"
+		</script>
+		
+		{#if $mode == "light"}
+			<img src={light} alt="${provider.name} logo" {...$$restProps}>
+		{:else}
+			<img src={dark} alt="${provider.name} logo" {...$$restProps}>
+		{/if}
+		`;
 														} else {
 															await fs
 																.copy(
@@ -515,11 +502,11 @@ const main = async () => {
 																.catch((err) => error(err));
 
 															iconComponent = `<script lang="ts">
-																import logo from "$lib/assets/icons/${provider.name.toLowerCase()}.svg"
-															</script>
-															
-															<img src={logo} alt="${provider.name} logo" {...$$restProps}>
-															`;
+																		import logo from "$lib/assets/icons/${provider.name.toLowerCase()}.svg"
+																	</script>
+																	
+																	<img src={logo} alt="${provider.name} logo" {...$$restProps}>
+																	`;
 														}
 
 														await fs.writeFile(
@@ -573,18 +560,18 @@ const main = async () => {
 														(provider, index) => {
 															if (index == 0) {
 																return `{#if provider.name == '${provider}'}
-						<${provider} class="size-5"/>
-					${index == result.length - 1 ? '{/if}' : ''}`;
+								<${provider} class="size-5"/>
+							${index == result.length - 1 ? '{/if}' : ''}`;
 															}
 
 															if (index == result.length - 1) {
 																return `\t\t\t\t\t{:else if provider.name == '${provider}'}
-						<${provider} class="size-5"/>
-					{/if}`;
+								<${provider} class="size-5"/>
+							{/if}`;
 															}
 
 															return `\t\t\t\t\t{:else if provider.name == '${provider}'}
-						<${provider} class="size-5"/>`;
+								<${provider} class="size-5"/>`;
 														}
 													);
 
@@ -631,14 +618,443 @@ const main = async () => {
 								endMessage: 'Installed @auth/sveltekit',
 							},
 						},
+					],
+				},
+				{
+					kind: 'multiselect',
+					message: 'Would you like to setup a database?',
+					required: false,
+					options: [
+						{
+							name: 'Turso',
+							hint: 'Free, 500 DBs, 9GB total storage, 1B row reads',
+							select: {
+								run: async ({ dir, state }) => {
+									state.usingDatabase = 'turso';
+
+									const envPath = path.join(dir, '.env');
+
+									let existed = true;
+
+									if (!(await fs.exists(envPath))) {
+										existed = false;
+										await fs.createFile(envPath);
+									}
+
+									let envContent = (await fs.readFile(envPath)).toString();
+
+									envContent =
+										envContent +
+										`${existed ? `\r\n` : ''}TURSO_DATABASE_URL=\r\nTURSO_AUTH_TOKEN=`;
+
+									await fs.writeFile(envPath, envContent);
+
+									return [
+										{
+											kind: 'confirm',
+											message: 'Setup database URL?',
+											yes: {
+												run: async () => {
+													return [
+														{
+															kind: 'text',
+															message: 'What is your database url?',
+															placeholder: '(right click to paste)',
+															validate: (dbUrl) => {
+																// libsql://testing-ieedan.turso.io
+																if (dbUrl == '')
+																	return 'Please enter a database URL.';
+
+																if (!dbUrl.startsWith('libsql://'))
+																	return 'Please enter a valid database URL';
+
+																if (!dbUrl.endsWith('turso.io'))
+																	return 'The database url must have a turso domain.';
+															},
+															result: {
+																run: async (result) => {
+																	let content = (
+																		await fs.readFile(envPath)
+																	).toString();
+
+																	content = content.replace(
+																		'TURSO_DATABASE_URL=',
+																		`TURSO_DATABASE_URL="${result}"`
+																	);
+
+																	await fs.writeFile(
+																		envPath,
+																		content
+																	);
+																},
+															},
+														},
+													];
+												},
+											},
+										},
+										{
+											kind: 'confirm',
+											message: 'Setup API Key?',
+											yes: {
+												run: async () => {
+													return [
+														{
+															kind: 'password',
+															message: `Enter your API key`,
+															validate: (key) => {
+																if (key == '')
+																	return 'Please enter your API key.';
+															},
+															result: {
+																run: async (result) => {
+																	let envContent = (
+																		await fs.readFile(envPath)
+																	).toString();
+
+																	envContent = envContent.replace(
+																		'TURSO_AUTH_TOKEN=',
+																		`TURSO_AUTH_TOKEN="${result}"`
+																	);
+
+																	await fs.writeFile(
+																		envPath,
+																		envContent
+																	);
+																},
+															},
+														},
+													];
+												},
+											},
+										},
+										{
+											kind: 'select',
+											message: 'What ORM would you like to use?',
+											initialValue: 'Drizzle',
+											options: [
+												{
+													name: 'Drizzle',
+													hint: 'https://orm.drizzle.team/',
+													select: {
+														run: async ({ error }) => {
+															await addDependencies(
+																dir,
+																packages['drizzle-orm'],
+																packages['@libsql/client'],
+																packages['drizzle-kit'],
+																packages['dotenv']
+															);
+
+															await fs
+																.copy(
+																	util.relative(
+																		'../templates/sveltekit/template-files/db/turso/drizzle/db/db.ts',
+																		import.meta.url
+																	),
+																	path.join(
+																		dir,
+																		'src/lib/db/db.ts'
+																	)
+																)
+																.catch((err) => error(err));
+
+															await fs
+																.copy(
+																	util.relative(
+																		'../templates/sveltekit/template-files/db/turso/drizzle/db/schema.ts',
+																		import.meta.url
+																	),
+																	path.join(
+																		dir,
+																		'src/lib/db/schema.ts'
+																	)
+																)
+																.catch((err) => error(err));
+
+															await fs
+																.copy(
+																	util.relative(
+																		'../templates/sveltekit/template-files/db/turso/drizzle/drizzle.config.ts',
+																		import.meta.url
+																	),
+																	path.join(
+																		dir,
+																		'drizzle.config.ts'
+																	)
+																)
+																.catch((err) => error(err));
+
+															await fs
+																.copy(
+																	util.relative(
+																		'../templates/sveltekit/template-files/db/turso/drizzle/migrate.ts',
+																		import.meta.url
+																	),
+																	path.join(dir, 'migrate.ts')
+																)
+																.catch((err) => error(err));
+
+															await addScript(dir, {
+																name: 'migrations:run',
+																script: 'npx tsx migrate.ts',
+															});
+
+															await addScript(dir, {
+																name: 'migrations:generate',
+																script: 'drizzle-kit generate',
+															});
+														},
+														startMessage:
+															'Installing and configuring drizzle-orm for Turso',
+														endMessage:
+															'Installed and configured drizzle-orm for Turso',
+													},
+												},
+											],
+										},
+									];
+								},
+							},
+						},
+						{
+							name: 'Xata',
+							hint: 'Free forever, 10 DB Branches, 15GB storage',
+							select: {
+								run: async ({ state, dir }) => {
+									state.usingDatabase = 'xata';
+
+									const rcPath = path.join(dir, '.xatarc');
+
+									await fs.copy(
+										util.relative(
+											'../templates/sveltekit/template-files/db/xata/.xatarc',
+											import.meta.url
+										),
+										rcPath
+									);
+
+									await fs.copy(
+										util.relative(
+											'../templates/sveltekit/template-files/db/xata/xata.ts',
+											import.meta.url
+										),
+										path.join(dir, 'src/lib/db/xata.ts')
+									);
+
+									const envPath = path.join(dir, '.env');
+
+									let existed = true;
+
+									if (!(await fs.exists(envPath))) {
+										existed = false;
+										await fs.createFile(envPath);
+									}
+
+									let envContent = (await fs.readFile(envPath)).toString();
+
+									envContent =
+										envContent +
+										`${existed ? `\r\n` : ''}XATA_BRANCH="main"\r\nXATA_API_KEY`;
+
+									await fs.writeFile(envPath, envContent);
+
+									return [
+										{
+											kind: 'confirm',
+											message: 'Setup database URL?',
+											yes: {
+												run: async () => {
+													return [
+														{
+															kind: 'text',
+															message: 'What is your database url?',
+															placeholder: '(right click to paste)',
+															validate: (dbUrl) => {
+																if (dbUrl == '')
+																	return 'Please enter a database URL.';
+
+																let url: URL;
+
+																try {
+																	url = new URL(dbUrl);
+																} catch (_) {
+																	return 'Please provide a valid URL.';
+																}
+
+																if (url.protocol != 'https:')
+																	return 'Must be a secure domain!';
+
+																if (!url.origin.endsWith('xata.sh'))
+																	return "Must be from 'xata.sh'!";
+
+																if (
+																	!url.pathname.match(
+																		/\/db\/\S+/g
+																	)
+																)
+																	return 'Must reference a database!';
+															},
+															result: {
+																run: async (result) => {
+																	let content = (
+																		await fs.readFile(rcPath)
+																	).toString();
+
+																	content = content.replace(
+																		'YOUR_DATA_BASE_URL',
+																		result
+																	);
+
+																	await fs.writeFile(
+																		rcPath,
+																		content
+																	);
+																},
+															},
+														},
+													];
+												},
+												startMessage: 'Configuring .xatarc',
+												endMessage: 'Configured .xatarc',
+											},
+										},
+										{
+											kind: 'confirm',
+											message: 'Setup API Key?',
+											yes: {
+												run: async () => {
+													return [
+														{
+															kind: 'password',
+															message: `Enter your API key ${color.gray('(get it from https://app.xata.io/settings)')}`,
+															validate: (key) => {
+																if (key == '')
+																	return 'Please enter your API key.';
+															},
+															result: {
+																run: async (result) => {
+																	let envContent = (
+																		await fs.readFile(envPath)
+																	).toString();
+
+																	envContent = envContent.replace(
+																		'XATA_API_KEY',
+																		`XATA_API_KEY="${result}"`
+																	);
+
+																	await fs.writeFile(
+																		envPath,
+																		envContent
+																	);
+																},
+															},
+														},
+													];
+												},
+											},
+										},
+										{
+											kind: 'select',
+											message: 'What ORM would you like to use?',
+											initialValue: 'Kysely',
+											options: [
+												{
+													name: 'Drizzle',
+													hint: 'https://orm.drizzle.team/',
+													select: {
+														run: async ({ error }) => {
+															await addDependencies(
+																dir,
+																packages['drizzle-orm'],
+																packages['@xata.io/client'],
+																packages['dotenv']
+															);
+
+															await fs
+																.copy(
+																	util.relative(
+																		'../templates/sveltekit/template-files/db/xata/drizzle/db/http/xata-util.ts',
+																		import.meta.url
+																	),
+																	path.join(
+																		dir,
+																		'src/lib/db/xata-util.ts'
+																	)
+																)
+																.catch((err) => error(err));
+														},
+													},
+													startMessage:
+														'Installing and configuring drizzle-orm for Xata',
+													endMessage:
+														'Installed and configured drizzle-orm for Xata',
+												},
+												{
+													name: 'Kysely',
+													hint: 'https://kysely.dev/',
+													select: {
+														run: async () => {
+															await addDependencies(
+																dir,
+																packages['@xata.io/kysely'],
+																packages['@xata.io/client'],
+																packages['kysely'],
+																packages['dotenv']
+															);
+
+															await fs.copy(
+																util.relative(
+																	'../templates/sveltekit/template-files/db/xata/kysely/db/xata-util.ts',
+																	import.meta.url
+																),
+																path.join(
+																	dir,
+																	'src/lib/db/xata-util.ts'
+																)
+															);
+														},
+														startMessage:
+															'Installing and configuring Kysely for Xata',
+														endMessage:
+															'Installed and configured Kysely for Xata',
+													},
+												},
+											],
+										},
+									];
+								},
+							},
+						},
+					],
+				},
+				{
+					kind: 'multiselect',
+					message: 'What features should be included?',
+					options: [
+						{
+							name: 'sveltekit-superforms',
+							select: {
+								run: async ({ dir }) => {
+									await addDependencies(
+										dir,
+										packages['sveltekit-superforms'],
+										packages['zod']
+									);
+								},
+								startMessage: 'Installing zod, and sveltekit-superforms',
+								endMessage: 'Installed sveltekit-superforms',
+							},
+						},
 						{
 							name: 'Threlte',
 							select: {
 								run: async ({ dir }) => {
 									await addDependencies(
-										['@threlte/core', 'three', '@types/three'],
-										'regular',
-										{ pm, dir }
+										dir,
+										packages['three'],
+										packages['@threlte/core'],
+										packages['@types/three']
 									);
 
 									return [
@@ -657,10 +1073,7 @@ const main = async () => {
 												name: pack,
 												select: {
 													run: async ({ dir }) => {
-														await addDependencies([pack], 'regular', {
-															pm,
-															dir,
-														});
+														await addDependencies(dir, packages[pack]);
 													},
 													startMessage: `Installing ${pack}`,
 													endMessage: `Installed ${pack}`,
@@ -741,8 +1154,7 @@ This project was created for you with the help of [template-factory](https://git
 				}
 			},
 			completed: async ({ state, projectName }) => {
-				let nextSteps = `Next steps:
-   1. ${color.cyan(`cd ${projectName}`)}`;
+				let nextSteps = `Next steps:\n   1. ${color.cyan(`cd ${projectName}`)}`;
 
 				let step = 2;
 
@@ -757,6 +1169,36 @@ This project was created for you with the help of [template-factory](https://git
 						`\n   ${step}. Configure providers (${state.addedProviders.join(', ')}) in .env. See the Auth.js docs https://authjs.dev/getting-started/authentication/oauth`;
 
 					step++;
+				}
+
+				if (state.usingDatabase) {
+					if (state.usingDatabase == 'turso') {
+						nextSteps =
+							nextSteps +
+							`\n   ${step}. Create your schema in ${color.cyan('src/lib/db/schema.ts')}`;
+						step++;
+						nextSteps =
+							nextSteps +
+							`\n   ${step}. Run ${color.cyan('npm run migrations:generate')} to generate migrations`;
+						step++;
+						nextSteps =
+							nextSteps +
+							`\n   ${step}. Run ${color.cyan('npm run migrations:run')} to run migrations`;
+						step++;
+					} else if (state.usingDatabase == 'xata') {
+						nextSteps =
+							nextSteps +
+							`\n   ${step}. Install the Xata CLI ${color.cyan(`npm install -g '@xata.io/cli'`)}`;
+						step++;
+						nextSteps =
+							nextSteps +
+							`\n   ${step}. Authenticate with ${color.cyan(`xata auth login`)}`;
+						step++;
+						nextSteps =
+							nextSteps +
+							`\n   ${step}. Generate schema from database with ${color.cyan(`xata pull main`)}`;
+						step++;
+					}
 				}
 
 				nextSteps = nextSteps + `\n   ${step}. ${color.cyan(`npm run dev -- --open`)}`;
@@ -781,9 +1223,10 @@ This project was created for you with the help of [template-factory](https://git
 					yes: {
 						run: async ({ dir }) => {
 							await addDependencies(
-								['typescript', 'unbuild', '@types/fs-extra'],
-								'dev',
-								{ pm, dir }
+								dir,
+								packages['unbuild'],
+								packages['typescript'],
+								packages['@types/fs-extra']
 							);
 
 							const buildConfigPath = util.relative(
@@ -793,14 +1236,15 @@ This project was created for you with the help of [template-factory](https://git
 
 							await fs.copy(buildConfigPath, path.join(dir, 'build.config.ts'));
 
-							const packagePath = path.join(dir, 'package.json');
+							await addScript(dir, {
+								name: 'start',
+								script: 'unbuild && node bin.mjs',
+							});
 
-							const pkg = JSON.parse((await fs.readFile(packagePath)).toString());
-
-							pkg.scripts.start = 'unbuild && node bin.mjs';
-							pkg.scripts.build = 'unbuild';
-
-							await fs.writeFile(packagePath, JSON.stringify(pkg, null, 2));
+							await addScript(dir, {
+								name: 'build',
+								script: 'unbuild',
+							});
 
 							const tsConfigPath = util.relative(
 								'../templates/template-factory/template-files/tsconfig.json',
@@ -836,13 +1280,7 @@ This project was created for you with the help of [template-factory](https://git
 					},
 					no: {
 						run: async ({ dir }) => {
-							const packagePath = path.join(dir, 'package.json');
-
-							const pkg = JSON.parse((await fs.readFile(packagePath)).toString());
-
-							pkg.scripts.start = 'node bin.mjs';
-
-							await fs.writeFile(packagePath, JSON.stringify(pkg, null, 2));
+							await addScript(dir, { name: 'start', script: 'node bin.mjs' });
 
 							const gitignore = `node_modules`;
 
@@ -870,7 +1308,7 @@ This project was created for you with the help of [template-factory](https://git
 					message: 'Install prettier?',
 					yes: {
 						run: async ({ dir }) => {
-							await addDependencies(['prettier'], 'dev', { pm, dir });
+							await addDependencies(dir, packages['prettier']);
 
 							const prettierrcPath = util.relative(
 								'../templates/template-factory/template-files/.prettierrc',
@@ -881,13 +1319,10 @@ This project was created for you with the help of [template-factory](https://git
 
 							await fs.writeFile(path.join(dir, '.prettierignore'), 'templates');
 
-							const packagePath = path.join(dir, 'package.json');
-
-							const pkg = JSON.parse((await fs.readFile(packagePath)).toString());
-
-							pkg.scripts.format = 'npx prettier . --write';
-
-							await fs.writeFile(packagePath, JSON.stringify(pkg, null, 2));
+							await addScript(dir, {
+								name: 'format',
+								script: 'npx prettier . --write',
+							});
 						},
 						startMessage: 'Setting up prettier',
 						endMessage: 'Set up prettier',
