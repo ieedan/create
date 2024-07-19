@@ -5,7 +5,7 @@ import * as util from 'template-factory/util';
 import { installDependencies } from 'template-factory/plugins/js/prompts';
 import { addDependencies, removeDependencies } from 'template-factory/plugins/js/util';
 import color from 'chalk';
-import { execa } from 'execa';
+import { execa as $ } from 'execa';
 import { SveltekitTemplateState } from './types';
 import { packages } from './packages';
 import { addScript } from './util';
@@ -20,8 +20,67 @@ const main = async () => {
 			flag: 'sveltekit',
 			path: util.relative('../templates/sveltekit', import.meta.url),
 			excludeFiles: ['package-lock.json', 'node_modules', 'template-files'],
-			state: { installedDependencies: false, addedProviders: [] },
+			state: {
+				installedDependencies: false,
+				addedProviders: [],
+				shadcnSvelteConfig: { style: 'default' },
+			},
 			prompts: [
+				{
+					kind: 'select',
+					message: `${color.bgHex('#ff5500').black(' shadcn-svelte ')} Which style would you like to use?`,
+					initialValue: 'Default',
+					options: [
+						{
+							name: 'Default',
+						},
+						{
+							name: 'New York',
+						},
+					],
+					result: {
+						run: async (result, { state }) => {
+							if (result == 'Default') {
+								state.shadcnSvelteConfig.style = 'default';
+							} else if (result == 'New York') {
+								state.shadcnSvelteConfig.style = 'new-york';
+							}
+						},
+					},
+				},
+				{
+					kind: 'select',
+					message: `${color.bgHex('#ff5500').black(' shadcn-svelte ')} Which base color would you like to use?`,
+					initialValue: 'Zinc',
+					options: [
+						{
+							name: 'Slate',
+						},
+						{
+							name: 'Gray',
+						},
+						{
+							name: 'Zinc',
+						},
+						{
+							name: 'Neutral',
+						},
+						{
+							name: 'Stone',
+						},
+					],
+					result: {
+						run: async (result, { state, dir, error }) => {
+							await $({
+								cwd: dir,
+							})`npx shadcn-svelte@latest init --style ${state.shadcnSvelteConfig.style} --base-color ${result.toLowerCase()} --css src/app.css --tailwind-config tailwind.config.ts --components-alias $lib/components --utils-alias $lib/utils.ts`.catch(
+								(err) => error(err)
+							);
+						},
+						startMessage: `Configuring ${color.bold('shadcn-svelte')}`,
+						endMessage: `Configured ${color.bold('shadcn-svelte')}`,
+					},
+				},
 				{
 					kind: 'select',
 					message: 'What is your deployment environment?',
@@ -336,7 +395,7 @@ const main = async () => {
 											message: "Generate auth secret and add it to '.env'?",
 											yes: {
 												run: async ({ dir }) => {
-													await execa({
+													await $({
 														cwd: dir,
 													})`npx auth secret`;
 												},
@@ -1093,7 +1152,7 @@ const main = async () => {
 					message: 'Install dependencies?',
 					yes: {
 						run: async ({ dir, state }) => {
-							await execa({
+							await $({
 								cwd: dir,
 							})`${pm} install`;
 
@@ -1153,7 +1212,18 @@ This project was created for you with the help of [template-factory](https://git
 					await fs.writeFile(path.join(dir, file.name), file.content);
 				}
 			},
-			completed: async ({ state, projectName }) => {
+			completed: async ({ state, projectName, dir }) => {
+				// Adds the /.sveltekit ignore back after completion
+				const ignorePath = path.join(dir, '.gitignore');
+
+				let ignoreContent = (await fs.readFile(ignorePath)).toString();
+
+				ignoreContent = ignoreContent.replace('.vercel', '.vercel\r\n/.svelte-kit');
+
+				await fs.writeFile(ignorePath, ignoreContent);
+
+				// Show next steps
+
 				let nextSteps = `Next steps:\n   1. ${color.cyan(`cd ${projectName}`)}`;
 
 				let step = 2;
