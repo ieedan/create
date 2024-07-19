@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
-	import LightSwitch from '$lib/components/ui/light-svelte/light-switch.svelte';
+	import LightSwitch from '$lib/components/ui/light-switch';
 </script>
 
 <header class="flex place-items-center justify-center border-b px-6 py-2">

@@ -3,7 +3,7 @@
 	import * as Avatar from '$lib/components/ui/avatar';
 	import { Button } from '$lib/components/ui/button';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import LightSwitch from '$lib/components/ui/light-svelte/light-switch.svelte';
+	import LightSwitch from '$lib/components/ui/light-switch';
 	import { SignOut } from '@auth/sveltekit/components';
 </script>
 

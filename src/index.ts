@@ -76,6 +76,24 @@ const main = async () => {
 							})`npx shadcn-svelte@latest init --style ${state.shadcnSvelteConfig.style} --base-color ${result.toLowerCase()} --css src/app.css --tailwind-config tailwind.config.ts --components-alias $lib/components --utils-alias $lib/utils.ts`.catch(
 								(err) => error(err)
 							);
+
+							// Add font family to tailwind.config.ts
+							const tailwindConfigPath = path.join(dir, 'tailwind.config.ts');
+							let tailwindConfigContent = (
+								await fs.readFile(tailwindConfigPath)
+							).toString();
+
+							tailwindConfigContent = tailwindConfigContent.replace(
+								`fontFamily: {
+				sans: [...fontFamily.sans]
+			}`,
+								`fontFamily: {
+				serif: ['Geist Mono', 'Monospace'],
+				sans: ['Geist Sans', 'sans-serif']
+			}`
+							);
+
+							await fs.writeFile(tailwindConfigPath, tailwindConfigContent);
 						},
 						startMessage: `Configuring ${color.bold('shadcn-svelte')}`,
 						endMessage: `Configured ${color.bold('shadcn-svelte')}`,
