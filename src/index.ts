@@ -73,9 +73,12 @@ const main = async () => {
 						run: async (result, { state, dir, error }) => {
 							await $({
 								cwd: dir,
-							})`npx shadcn-svelte@latest init --style ${state.shadcnSvelteConfig.style} --base-color ${result.toLowerCase()} --css src/app.css --tailwind-config tailwind.config.ts --components-alias $lib/components --utils-alias $lib/utils.ts`.catch(
+							})`npx shadcn-svelte@latest init --no-deps --style ${state.shadcnSvelteConfig.style} --base-color ${result.toLowerCase()} --css src/app.css --tailwind-config tailwind.config.ts --components-alias $lib/components --utils-alias $lib/utils.ts`.catch(
 								(err) => error(err)
 							);
+
+							// !TODO add dependencies https://www.shadcn-svelte.com/docs/installation/manual
+							await addDependencies();
 
 							// Add font family to tailwind.config.ts
 							const tailwindConfigPath = path.join(dir, 'tailwind.config.ts');
