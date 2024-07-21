@@ -16,8 +16,7 @@
 		".gitignore"
 	],
 	"publishConfig": {
-		"scripts": {},
-		"devDependencies": {}
+		"access": "public"
 	},
 	"typesVersions": {
 		"*": {
@@ -59,9 +58,10 @@
 		"chalk": "^5.3.0",
 		"execa": "^9.3.0",
 		"fs-extra": "^11.2.0",
-		"template-factory": "^0.2.4"
+		"template-factory": "^0.3.0"
 	},
 	"devDependencies": {
+		"@changesets/cli": "^2.27.7",
 		"@eslint/js": "^9.7.0",
 		"@types/fs-extra": "^11.0.4",
 		"@types/node": "^20.14.10",

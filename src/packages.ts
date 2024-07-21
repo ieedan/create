@@ -3,6 +3,31 @@ type Package = { name: string; version: string; scope: 'dev' | 'regular' };
 // Packages are kept here so that keeping track of versioning is easier
 
 export const packages: Record<string, Package> = {
+	'tailwind-variants': {
+		name: 'tailwind-variants',
+		scope: 'regular',
+		version: '^0.2.1',
+	},
+	clsx: {
+		name: 'clsx',
+		scope: 'regular',
+		version: '^2.1.1',
+	},
+	'tailwind-merge': {
+		name: 'tailwind-merge',
+		scope: 'regular',
+		version: '^2.4.0',
+	},
+	'lucide-svelte': {
+		name: 'lucide-svelte',
+		scope: 'regular',
+		version: '^0.412.0',
+	},
+	'svelte-radix': {
+		name: 'svelte-radix',
+		scope: 'regular',
+		version: '^1.1.0',
+	},
 	'sveltekit-adapter-iis': {
 		name: 'sveltekit-adapter-iis',
 		scope: 'dev',
