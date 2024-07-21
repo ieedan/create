@@ -15,6 +15,7 @@ npx @iedan/create
 ## Templates
 
 ### SvelteKit
+
 A starter project for **SvelteKit**.
 
 ```bash
