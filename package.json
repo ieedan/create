@@ -16,8 +16,7 @@
 		".gitignore"
 	],
 	"publishConfig": {
-		"scripts": {},
-		"devDependencies": {}
+		"access": "public"
 	},
 	"typesVersions": {
 		"*": {
