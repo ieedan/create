@@ -3,7 +3,7 @@
 	import LightSwitch from '$lib/components/ui/light-switch';
 </script>
 
-<header class="flex place-items-center justify-center border-b px-6 py-2">
+<header class="flex place-items-center justify-center border-b border-border px-6 py-2">
 	<div class="flex w-full max-w-6xl place-items-center justify-between">
 		<div></div>
 		<div class="flex place-items-center gap-2">

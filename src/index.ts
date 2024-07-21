@@ -77,8 +77,33 @@ const main = async () => {
 								(err) => error(err)
 							);
 
-							// !TODO add dependencies https://www.shadcn-svelte.com/docs/installation/manual
-							await addDependencies();
+							await addDependencies(
+								dir,
+								packages['clsx'],
+								packages['tailwind-merge'],
+								packages['tailwind-variants']
+							);
+
+							if (state.shadcnSvelteConfig.style == 'new-york') {
+								await addDependencies(dir, packages['svelte-radix']);
+
+								await fs.copy(
+									util.relative(
+										'../templates/sveltekit/template-files/styles/new-york/light-switch',
+										import.meta.url
+									),
+									path.join(dir, 'src/lib/components/ui/light-switch')
+								);
+							} else {
+								await addDependencies(dir, packages['lucide-svelte']);
+								await fs.copy(
+									util.relative(
+										'../templates/sveltekit/template-files/styles/default/light-switch',
+										import.meta.url
+									),
+									path.join(dir, 'src/lib/components/ui/light-switch')
+								);
+							}
 
 							// Add font family to tailwind.config.ts
 							const tailwindConfigPath = path.join(dir, 'tailwind.config.ts');
@@ -1184,15 +1209,15 @@ const main = async () => {
 					},
 				},
 			],
-			templateFiles: [
+			files: [
 				{
 					path: 'package.json',
-					replacements: [
-						{
-							match: '"sveltekit-template"',
-							replace: ({ projectName }) => `"${projectName}"`,
-						},
-					],
+					type: 'text',
+					content: async ({ content, name }, { projectName }) => {
+						content = content.replace('"sveltekit-template"', `"${projectName}"`);
+
+						return { content, name };
+					},
 				},
 			],
 			copyCompleted: async ({ dir, projectName }) => {
@@ -1441,15 +1466,18 @@ This project was created for you with the help of [template-factory](https://git
 				},
 				installDependencies({ pm: 'npm', choosePackageManager: false }),
 			],
-			templateFiles: [
+			files: [
 				{
 					path: 'package.json',
-					replacements: [
-						{
-							match: 'template-placeholder-name',
-							replace: ({ projectName }) => `${projectName}`,
-						},
-					],
+					type: 'text',
+					content: async ({ content, name }, { projectName }) => {
+						content = content.replace(
+							'"template-placeholder-name"',
+							`"${projectName}"`
+						);
+
+						return { content, name };
+					},
 				},
 			],
 		} satisfies Template<unknown>,
