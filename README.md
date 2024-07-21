@@ -21,16 +21,35 @@ A start project for SvelteKit.
 Comes installed with:
 
 -   [TailwindCSS](https://tailwindcss.com/) (CSS)
--   [shadcn-svelte](https://www.shadcn-svelte.com/) (components)
+-   [shadcn-svelte](https://www.shadcn-svelte.com/) (components) (Now Configurable!)
 -   [mode-watcher](https://github.com/svecosystem/mode-watcher) (light/dark mode)
 -   [prettier](https://prettier.io/) Formatting
 -   [eslint](https://eslint.org/) Linting
 
 And allows you to choose to add:
 
--   [sveltekit-superforms](https://superforms.rocks/)
+#### Deployment Environments
+
+-   Auto
+-   [Vercel](https://vercel.com/)
+-   IIS
+
+#### Authentication
+
 -   [Auth.js](https://authjs.dev/)
+
+#### Database
+
+-   [Xata](https://xata.io/)
+    -   With [Drizzle](https://orm.drizzle.team/)
+    -   Or [Kysely](https://kysely.dev/)
+-   [Turso](https://turso.tech/)
+    -   With [Drizzle](https://orm.drizzle.team/)
+
+#### Other Features
+
 -   [threlte](https://threlte.xyz/)
+-   [sveltekit-superforms](https://superforms.rocks/)
 
 ### template-factory
 

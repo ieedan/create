@@ -39,7 +39,8 @@
 		"build": "unbuild",
 		"check": "tsc --noEmit",
 		"start": "unbuild && node bin.mjs",
-		"lint": "prettier --check . && eslint ."
+		"lint": "prettier --check . && eslint .",
+		"ci:release": "npm run build && changeset publish"
 	},
 	"repository": {
 		"type": "git",
