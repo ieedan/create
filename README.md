@@ -15,13 +15,16 @@ npx @iedan/create
 ## Templates
 
 ### SvelteKit
+A starter project for **SvelteKit**.
 
-A start project for SvelteKit.
+```bash
+npx @iedan/create -t sveltekit
+```
 
 Comes installed with:
 
 -   [TailwindCSS](https://tailwindcss.com/) (CSS)
--   [shadcn-svelte](https://www.shadcn-svelte.com/) (components) (Now Configurable!)
+-   [shadcn-svelte](https://www.shadcn-svelte.com/) (UI) (Now Configurable!)
 -   [mode-watcher](https://github.com/svecosystem/mode-watcher) (light/dark mode)
 -   [prettier](https://prettier.io/) Formatting
 -   [eslint](https://eslint.org/) Linting
@@ -54,6 +57,10 @@ And allows you to choose to add:
 ### template-factory
 
 A project template to get you started creating your own project templates with [template-factory-js](https://github.com/ieedan/template-factory-js).
+
+```bash
+npx @iedan/create -t template-factory
+```
 
 ## Development
 
