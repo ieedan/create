@@ -3,6 +3,46 @@ type Package = { name: string; version: string; scope: 'dev' | 'regular' };
 // Packages are kept here so that keeping track of versioning is easier
 
 export const packages: Record<string, Package> = {
+	arktype: {
+		name: 'arktype',
+		scope: 'regular',
+		version: '^2.0.0-beta.0',
+	},
+	joi: {
+		name: 'joi',
+		scope: 'regular',
+		version: '^17.13.3',
+	},
+	'@exodus/schemasafe': {
+		name: '@exodus/schemasafe',
+		scope: 'regular',
+		version: '^1.3.0',
+	},
+	superstruct: {
+		name: 'superstruct',
+		scope: 'regular',
+		version: '^2.0.2',
+	},
+	'@sinclair/typebox': {
+		name: '@sinclair/typebox',
+		scope: 'regular',
+		version: '^0.32.34',
+	},
+	valibot: {
+		name: 'valibot',
+		scope: 'regular',
+		version: '^0.36.0',
+	},
+	'@vinejs/vine': {
+		name: '@vinejs/vine',
+		scope: 'regular',
+		version: '^2.1.0',
+	},
+	yup: {
+		name: 'yup',
+		scope: 'regular',
+		version: '^1.4.0',
+	},
 	'tailwind-variants': {
 		name: 'tailwind-variants',
 		scope: 'regular',

@@ -1141,13 +1141,43 @@ const main = async () => {
 							name: 'sveltekit-superforms',
 							select: {
 								run: async ({ dir }) => {
-									await addDependencies(
-										dir,
-										packages['sveltekit-superforms'],
-										packages['zod']
-									);
+									await addDependencies(dir, packages['sveltekit-superforms']);
+
+									return [
+										{
+											kind: 'select',
+											message:
+												'What validation library would you like to use?',
+											initialValue: 'Zod',
+											options: [
+												{ name: 'Arktype', npmName: 'arktype' },
+												{ name: 'Joi', npmName: 'joi' },
+												{
+													name: 'JSON Schema',
+													npmName: '@exodus/schemasafe',
+												},
+												{ name: 'Superstruct', npmName: 'superstruct' },
+												{ name: 'TypeBox', npmName: '@sinclair/typebox' },
+												{ name: 'Valibot', npmName: 'valibot' },
+												{ name: 'VineJS', npmName: '@vinejs/vine' },
+												{ name: 'Yup', npmName: 'yup' },
+												{ name: 'Zod', npmName: 'zod' },
+											].map((pack) => ({
+												name: pack.name,
+												hint: pack.npmName,
+												select: {
+													run: async ({ dir }) => {
+														await addDependencies(
+															dir,
+															packages[pack.npmName]
+														);
+													},
+												},
+											})),
+										},
+									];
 								},
-								startMessage: 'Installing zod, and sveltekit-superforms',
+								startMessage: 'Installing sveltekit-superforms',
 								endMessage: 'Installed sveltekit-superforms',
 							},
 						},
