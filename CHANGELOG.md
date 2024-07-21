@@ -1,5 +1,11 @@
 # @iedan/create
 
+## 1.2.0
+
+### Minor Changes
+
+-   c34eb4a: feat: Can now choose what validation library you would like to use alongside SvelteKit superforms
+
 ## 1.1.0
 
 ### Minor Changes
