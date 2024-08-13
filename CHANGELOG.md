@@ -1,5 +1,11 @@
 # @iedan/create
 
+## 1.2.1
+
+### Patch Changes
+
+-   ef6a0dd: fix: Removes `.ts` postfix from the shadcn-svelte import alias to fix issue with paths.
+
 ## 1.2.0
 
 ### Minor Changes
