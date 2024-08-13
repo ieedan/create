@@ -73,7 +73,7 @@ const main = async () => {
 						run: async (result, { state, dir, error }) => {
 							await $({
 								cwd: dir,
-							})`npx shadcn-svelte@latest init --no-deps --style ${state.shadcnSvelteConfig.style} --base-color ${result.toLowerCase()} --css src/app.css --tailwind-config tailwind.config.ts --components-alias $lib/components --utils-alias $lib/utils.ts`.catch(
+							})`npx shadcn-svelte@latest init --no-deps --style ${state.shadcnSvelteConfig.style} --base-color ${result.toLowerCase()} --css src/app.css --tailwind-config tailwind.config.ts --components-alias $lib/components --utils-alias $lib/utils`.catch(
 								(err) => error(err)
 							);
 
