@@ -1517,6 +1517,7 @@ This project was created for you with the help of [template-factory](https://git
 			name: 'ts-package',
 			flag: 'ts-package',
 			path: util.relative('../templates/ts-package', import.meta.url),
+			state: { ciSteps: [] },
 			excludeFiles: ['node_modules', 'template-files'],
 			prompts: [
 				{
@@ -1537,6 +1538,27 @@ This project was created for you with the help of [template-factory](https://git
 										);
 										await fs.copyFile(biomeJson, path.join(dir, 'biome.json'));
 
+										const pkgPath = path.join(dir, 'package.json');
+
+										const pkg = JSON.parse(
+											(await fs.readFile(pkgPath)).toString()
+										);
+
+										pkg['lint'] = 'biome lint --write';
+										pkg['format'] = 'biome format --write';
+										pkg['check'] = 'biome check';
+
+										await fs.writeFile(pkgPath, JSON.stringify(pkg));
+
+										const ciPath = path.join(dir, '.github/workflows/ci.yml');
+
+										let ci = (await fs.readFile(ciPath)).toString();
+
+										ci = ci.replace(`#- name: Lint`, `- name: Lint`);
+										ci = ci.replace(`#  run: pnpm check`, `  run: pnpm check`);
+
+										await fs.writeFile(ciPath, ci);
+
 										await addDependencies(dir, packages['@biomejs/biome']);
 									} catch (err) {
 										error(`Error setting up biome: ${err}`);
@@ -1556,6 +1578,26 @@ This project was created for you with the help of [template-factory](https://git
 											import.meta.url
 										);
 										await fs.copyFile(testTs, path.join(dir, 'index.test.ts'));
+
+										const pkgPath = path.join(dir, 'package.json');
+
+										const pkg = JSON.parse(
+											(await fs.readFile(pkgPath)).toString()
+										);
+
+										pkg['test'] = 'vitest';
+
+										await fs.writeFile(pkgPath, JSON.stringify(pkg));
+
+										const ciPath = path.join(dir, '.github/workflows/ci.yml');
+
+										let ci = (await fs.readFile(ciPath)).toString();
+
+										ci = ci.replace(`#- name: Test`, `- name: Test`);
+										ci = ci.replace(`#  run: pnpm test`, `  run: pnpm test`);
+
+										await fs.writeFile(ciPath, ci);
+
 										await addDependencies(dir, packages['vitest']);
 									} catch (err) {
 										error(`Error setting up vitest: ${err}`);
@@ -1578,6 +1620,26 @@ This project was created for you with the help of [template-factory](https://git
 											configJson,
 											path.join(dir, 'config.json')
 										);
+
+										const publishYml = util.relative(
+											'../templates/ts-package/template-files/.github/workflows/publish.yml',
+											import.meta.url
+										);
+										await fs.copyFile(
+											publishYml,
+											path.join(dir, './.github/workflows/publish.yml')
+										);
+
+										const pkgPath = path.join(dir, 'package.json');
+
+										const pkg = JSON.parse(
+											(await fs.readFile(pkgPath)).toString()
+										);
+
+										pkg['ci:release'] = 'unbuild && changeset publish';
+										pkg['changeset'] = 'changeset';
+
+										await fs.writeFile(pkgPath, JSON.stringify(pkg));
 
 										await addDependencies(dir, packages['@changesets/cli']);
 									} catch (err) {
