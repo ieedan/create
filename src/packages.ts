@@ -2,7 +2,7 @@ type Package = { name: string; version: string; scope: 'dev' | 'regular' };
 
 // Packages are kept here so that keeping track of versioning is easier
 
-export const packages: Record<string, Package> = {
+const packages = {
 	arktype: {
 		name: 'arktype',
 		scope: 'regular',
@@ -176,7 +176,7 @@ export const packages: Record<string, Package> = {
 	typescript: {
 		name: 'typescript',
 		scope: 'dev',
-		version: '^5.5.3',
+		version: '^5.6.2',
 	},
 	unbuild: {
 		name: 'unbuild',
@@ -203,4 +203,28 @@ export const packages: Record<string, Package> = {
 		scope: 'regular',
 		version: '^0.7.0',
 	},
-};
+	vitest: {
+		name: 'vitest',
+		scope: 'dev',
+		version: '^2.1.1',
+	},
+	'@changesets/cli': {
+		name: '@changesets/cli',
+		scope: 'dev',
+		version: '^2.27.8',
+	},
+	'@types/node': {
+		name: '@types/node',
+		scope: 'dev',
+		version: '^22.5.5',
+	},
+	'@biomejs/biome': {
+		name: '@biomejs/biome',
+		scope: 'dev',
+		version: '1.9.1',
+	},
+} satisfies Record<string, Package>;
+
+const pkgs = packages as Record<keyof typeof packages, Package>;
+
+export { pkgs as packages };
