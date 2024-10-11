@@ -35,8 +35,8 @@ And allows you to choose to add:
 #### Deployment Environments
 
 -   Auto
--   [Vercel](https://vercel.com/)
--   IIS
+-   [Vercel](https://kit.svelte.dev/docs/adapter-vercel)
+-   [IIS](https://github.com/abaga129/sveltekit-adapter-iis)
 
 #### Authentication
 
@@ -62,6 +62,17 @@ A project template to get you started creating your own project templates with [
 ```bash
 npx @iedan/create -t template-factory
 ```
+
+### ts-package
+
+A project template to get you started creating a npm package with TypeScript.
+
+#### Features
+
+- [biome](https://biomejs.dev/)
+- [changesets](https://github.com/changesets/changesets)
+- [vitest](https://vitest.dev/)
+- [ts-blocks](https://github.com/ieedan/ts-blocks)
 
 ## Development
 
