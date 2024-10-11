@@ -1,5 +1,11 @@
 # @iedan/create
 
+## 1.3.0
+
+### Minor Changes
+
+-   885e8fb: Adds **ts-package** template.
+
 ## 1.2.1
 
 ### Patch Changes
