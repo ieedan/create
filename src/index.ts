@@ -1169,6 +1169,7 @@ const main = async () => {
 													run: async ({ dir }) => {
 														await addDependencies(
 															dir,
+															// @ts-expect-error we can index this just fine
 															packages[pack.npmName]
 														);
 													},
@@ -1208,6 +1209,7 @@ const main = async () => {
 												name: pack,
 												select: {
 													run: async ({ dir }) => {
+														// @ts-expect-error we can index this just fine
 														await addDependencies(dir, packages[pack]);
 													},
 													startMessage: `Installing ${pack}`,
@@ -1505,6 +1507,186 @@ This project was created for you with the help of [template-factory](https://git
 							'"template-placeholder-name"',
 							`"${projectName}"`
 						);
+
+						return { content, name };
+					},
+				},
+			],
+		} satisfies Template<unknown>,
+		{
+			name: 'ts-package',
+			flag: 'ts-package',
+			path: util.relative('../templates/ts-package', import.meta.url),
+			state: { ciSteps: [] },
+			excludeFiles: ['node_modules', 'template-files'],
+			prompts: [
+				{
+					message: 'What features would you like to add?',
+					kind: 'multiselect',
+					required: false,
+					options: [
+						{
+							name: 'biome',
+							select: {
+								startMessage: 'Adding biome',
+								endMessage: 'Added biome',
+								run: async ({ dir, error }) => {
+									try {
+										const biomeJson = util.relative(
+											'../templates/ts-package/template-files/biome.json',
+											import.meta.url
+										);
+										await fs.copyFile(biomeJson, path.join(dir, 'biome.json'));
+
+										const pkgPath = path.join(dir, 'package.json');
+
+										const pkg = JSON.parse(
+											(await fs.readFile(pkgPath)).toString()
+										);
+
+										pkg['lint'] = 'biome lint --write';
+										pkg['format'] = 'biome format --write';
+										pkg['check'] = 'biome check';
+
+										await fs.writeFile(pkgPath, JSON.stringify(pkg));
+
+										const ciPath = path.join(dir, '.github/workflows/ci.yml');
+
+										let ci = (await fs.readFile(ciPath)).toString();
+
+										ci = ci.replace(`#- name: Lint`, `- name: Lint`);
+										ci = ci.replace(`#  run: pnpm check`, `  run: pnpm check`);
+
+										await fs.writeFile(ciPath, ci);
+
+										await addDependencies(dir, packages['@biomejs/biome']);
+									} catch (err) {
+										error(`Error setting up biome: ${err}`);
+									}
+								},
+							},
+						},
+						{
+							name: 'vitest',
+							select: {
+								startMessage: 'Adding vitest',
+								endMessage: 'Added vitest',
+								run: async ({ dir, error }) => {
+									try {
+										const testTs = util.relative(
+											'../templates/ts-package/template-files/index.test.ts',
+											import.meta.url
+										);
+										await fs.copyFile(testTs, path.join(dir, 'index.test.ts'));
+
+										const pkgPath = path.join(dir, 'package.json');
+
+										const pkg = JSON.parse(
+											(await fs.readFile(pkgPath)).toString()
+										);
+
+										pkg['test'] = 'vitest';
+
+										await fs.writeFile(pkgPath, JSON.stringify(pkg));
+
+										const ciPath = path.join(dir, '.github/workflows/ci.yml');
+
+										let ci = (await fs.readFile(ciPath)).toString();
+
+										ci = ci.replace(`#- name: Test`, `- name: Test`);
+										ci = ci.replace(`#  run: pnpm test`, `  run: pnpm test`);
+
+										await fs.writeFile(ciPath, ci);
+
+										await addDependencies(dir, packages['vitest']);
+									} catch (err) {
+										error(`Error setting up vitest: ${err}`);
+									}
+								},
+							},
+						},
+						{
+							name: 'changesets',
+							select: {
+								startMessage: 'Adding changesets',
+								endMessage: 'Added changesets',
+								run: async ({ dir, error }) => {
+									try {
+										const configJson = util.relative(
+											'../templates/ts-package/template-files/config.json',
+											import.meta.url
+										);
+										await fs.copyFile(
+											configJson,
+											path.join(dir, 'config.json')
+										);
+
+										const publishYml = util.relative(
+											'../templates/ts-package/template-files/.github/workflows/publish.yml',
+											import.meta.url
+										);
+										await fs.copyFile(
+											publishYml,
+											path.join(dir, './.github/workflows/publish.yml')
+										);
+
+										const pkgPath = path.join(dir, 'package.json');
+
+										const pkg = JSON.parse(
+											(await fs.readFile(pkgPath)).toString()
+										);
+
+										pkg['ci:release'] = 'unbuild && changeset publish';
+										pkg['changeset'] = 'changeset';
+
+										await fs.writeFile(pkgPath, JSON.stringify(pkg));
+
+										await addDependencies(dir, packages['@changesets/cli']);
+									} catch (err) {
+										error(`Error setting up changesets: ${err}`);
+									}
+								},
+							},
+						},
+						{
+							name: 'ts-blocks',
+							select: {
+								startMessage: 'Adding ts-blocks',
+								endMessage: 'Added ts-blocks',
+								run: async ({ dir, error }) => {
+									try {
+										const blocksJson = util.relative(
+											'../templates/ts-package/template-files/blocks.json',
+											import.meta.url
+										);
+										await fs.copyFile(
+											blocksJson,
+											path.join(dir, 'blocks.json')
+										);
+									} catch (err) {
+										error(`Error setting up ts-blocks: ${err}`);
+									}
+								},
+							},
+						},
+					],
+				},
+			],
+			files: [
+				{
+					path: 'package.json',
+					type: 'text',
+					content: async ({ content, name }, { projectName }) => {
+						content = content.replace('{{ PACKAGE_PLACEHOLDER }}', `${projectName}`);
+
+						return { content, name };
+					},
+				},
+				{
+					path: 'README.md',
+					type: 'text',
+					content: async ({ content, name }, { projectName }) => {
+						content = `# ${projectName}\n`;
 
 						return { content, name };
 					},
