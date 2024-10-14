@@ -1260,29 +1260,6 @@ const main = async () => {
 						content: `# ${projectName}
 This project was created for you with the help of [template-factory](https://github.com/ieedan/template-factory-js)`,
 					},
-					// these are not uploaded to NPM for some reason
-					{
-						name: '.gitignore',
-						content: (
-							await fs.readFile(
-								util.relative(
-									'../templates/sveltekit/template-files/gitignore.txt',
-									import.meta.url
-								)
-							)
-						).toString(),
-					},
-					{
-						name: '.npmrc',
-						content: (
-							await fs.readFile(
-								util.relative(
-									'../templates/sveltekit/template-files/npmrc.txt',
-									import.meta.url
-								)
-							)
-						).toString(),
-					},
 				];
 
 				// generate files
