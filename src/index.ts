@@ -1616,6 +1616,9 @@ This project was created for you with the help of [template-factory](https://git
 											'../templates/ts-package/template-files/config.json',
 											import.meta.url
 										);
+
+										await fs.mkdir(path.join(dir, './.changeset'));
+
 										await fs.copyFile(
 											configJson,
 											path.join(dir, './.changeset/config.json')
