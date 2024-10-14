@@ -1538,17 +1538,18 @@ This project was created for you with the help of [template-factory](https://git
 										);
 										await fs.copyFile(biomeJson, path.join(dir, 'biome.json'));
 
-										const pkgPath = path.join(dir, 'package.json');
-
-										const pkg = JSON.parse(
-											(await fs.readFile(pkgPath)).toString()
-										);
-
-										pkg['lint'] = 'biome lint --write';
-										pkg['format'] = 'biome format --write';
-										pkg['check'] = 'biome check';
-
-										await fs.writeFile(pkgPath, JSON.stringify(pkg));
+										await addScript(dir, {
+											name: 'lint',
+											script: 'biome lint --write',
+										});
+										await addScript(dir, {
+											name: 'format',
+											script: 'biome format --write',
+										});
+										await addScript(dir, {
+											name: 'check',
+											script: 'biome check',
+										});
 
 										const ciPath = path.join(dir, '.github/workflows/ci.yml');
 
@@ -1579,15 +1580,7 @@ This project was created for you with the help of [template-factory](https://git
 										);
 										await fs.copyFile(testTs, path.join(dir, 'index.test.ts'));
 
-										const pkgPath = path.join(dir, 'package.json');
-
-										const pkg = JSON.parse(
-											(await fs.readFile(pkgPath)).toString()
-										);
-
-										pkg['test'] = 'vitest';
-
-										await fs.writeFile(pkgPath, JSON.stringify(pkg));
+										await addScript(dir, { name: 'test', script: 'vitest' });
 
 										const ciPath = path.join(dir, '.github/workflows/ci.yml');
 
@@ -1633,16 +1626,14 @@ This project was created for you with the help of [template-factory](https://git
 											path.join(dir, './.github/workflows/publish.yml')
 										);
 
-										const pkgPath = path.join(dir, 'package.json');
-
-										const pkg = JSON.parse(
-											(await fs.readFile(pkgPath)).toString()
-										);
-
-										pkg['ci:release'] = 'unbuild && changeset publish';
-										pkg['changeset'] = 'changeset';
-
-										await fs.writeFile(pkgPath, JSON.stringify(pkg));
+										await addScript(dir, {
+											name: 'changeset',
+											script: 'changeset',
+										});
+										await addScript(dir, {
+											name: 'ci:release',
+											script: 'unbuild && changeset publish',
+										});
 
 										await addDependencies(dir, packages['@changesets/cli']);
 									} catch (err) {
@@ -1680,7 +1671,7 @@ This project was created for you with the help of [template-factory](https://git
 					path: 'package.json',
 					type: 'text',
 					content: async ({ content, name }, { projectName }) => {
-						content = content.replace('{{ PACKAGE_PLACEHOLDER }}', `${projectName}`);
+						content = content.replace('package-placeholder', `${projectName}`);
 
 						return { content, name };
 					},
