@@ -11,7 +11,7 @@
 		"package.json",
 		"package-lock.json",
 		"README.md",
-		"templates",
+		"templates/**/*",
 		"dist",
 		".gitignore"
 	],
