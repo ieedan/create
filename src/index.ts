@@ -1618,7 +1618,7 @@ This project was created for you with the help of [template-factory](https://git
 										);
 										await fs.copyFile(
 											configJson,
-											path.join(dir, 'config.json')
+											path.join(dir, './.changeset/config.json')
 										);
 
 										const publishYml = util.relative(
