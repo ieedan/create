@@ -69,10 +69,10 @@ A project template to get you started creating a npm package with TypeScript.
 
 #### Features
 
-- [biome](https://biomejs.dev/)
-- [changesets](https://github.com/changesets/changesets)
-- [vitest](https://vitest.dev/)
-- [ts-blocks](https://github.com/ieedan/ts-blocks)
+-   [biome](https://biomejs.dev/)
+-   [changesets](https://github.com/changesets/changesets)
+-   [vitest](https://vitest.dev/)
+-   [ts-blocks](https://github.com/ieedan/ts-blocks)
 
 ## Development
 
