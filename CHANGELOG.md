@@ -1,5 +1,11 @@
 # @iedan/create
 
+## 1.3.1
+
+### Patch Changes
+
+-   05818c5: Moves config.json into `.changeset`
+
 ## 1.3.0
 
 ### Minor Changes
