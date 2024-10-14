@@ -1,5 +1,11 @@
 # @iedan/create
 
+## 1.3.3
+
+### Patch Changes
+
+-   514ff80: Fix not uploaded files
+
 ## 1.3.2
 
 ### Patch Changes
