@@ -1,5 +1,11 @@
 # @iedan/create
 
+## 1.3.2
+
+### Patch Changes
+
+-   31b9eb7: Fixed issue with scripts being added properly
+
 ## 1.3.1
 
 ### Patch Changes
