@@ -1,5 +1,11 @@
 # @iedan/create
 
+## 1.3.4
+
+### Patch Changes
+
+-   1b27f47: Remove `ts-blocks` as an option from `ts-package`
+
 ## 1.3.3
 
 ### Patch Changes
