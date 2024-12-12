@@ -1619,29 +1619,9 @@ This project was created for you with the help of [template-factory](https://git
 								},
 							},
 						},
-						{
-							name: 'ts-blocks',
-							select: {
-								startMessage: 'Adding ts-blocks',
-								endMessage: 'Added ts-blocks',
-								run: async ({ dir, error }) => {
-									try {
-										const blocksJson = util.relative(
-											'../templates/ts-package/template-files/blocks.json',
-											import.meta.url
-										);
-										await fs.copyFile(
-											blocksJson,
-											path.join(dir, 'blocks.json')
-										);
-									} catch (err) {
-										error(`Error setting up ts-blocks: ${err}`);
-									}
-								},
-							},
-						},
 					],
 				},
+				installDependencies({ pm: 'pnpm', choosePackageManager: false }),
 			],
 			files: [
 				{
